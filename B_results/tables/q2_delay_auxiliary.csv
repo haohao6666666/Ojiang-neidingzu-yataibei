@@ -1,0 +1,6 @@
+method,n,estimate_a,estimate_b,spearman_Q_vs_tau,p_value
+"B: windowed xcorr, Theil-Sen tau = a + b/Q",44,-211.05843780338853,1249.156622228801,-0.7542358048360726,3.3866106338883236e-09
+"B: windowed xcorr, median lag (s)",44,40.5,,,
+C: heat-level best constant delay vs mean flow,10,42.5,,-0.012506107989614447,0.9726471670982842
+"D: gas onset after blow start (upper bound, s)",10,48.5,,,
+"E: flow-step events after 120 s (flame responds within 15 s), median delay (s)",3,33.0,,,

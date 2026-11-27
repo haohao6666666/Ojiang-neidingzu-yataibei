@@ -1,0 +1,4 @@
+,0
+final_model,M4 = M3 + heat-wise normalization
+best_alpha,0.5
+zoom_heat,5

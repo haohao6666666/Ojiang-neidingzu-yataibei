@@ -1,0 +1,7 @@
+parameter,estimate,ci_low,ci_high
+tau0 (s),0.0,0.0,30.0
+K (m3),170.0,0.0,400.0
+Constant delay L (s),31.0,0.0,76.0
+CV R2 gain transport vs constant,0.004029292600088524,-0.0018596714752305676,0.03752948089640111
+P(transport better than constant),0.7695,,
+"ADOPTED K (m3), model tau = K/Q",170.0,0.0,400.0
