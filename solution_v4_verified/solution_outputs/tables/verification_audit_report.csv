@@ -1,0 +1,7 @@
+Audit_Check,Status,Metric
+1_Finiteness_NonNegativity_SatBound_and_Zero3DUndershoot,PASS,"finite=True, min_sat=65530.0, 3d_neg=0, min_dO2=0.00e+00"
+2_Concentration_Integral_Closure,PASS,max_endpoint_closure_diff=3.64e-11 volpct*s
+3_Arrival_Clock_Strict_Monotonicity_No_TimeFolding,PASS,"folded_steps=0, min_da_step=3.5808e-07 s"
+4_Noisy_BlindStart_Synthetic_Delay_Recovery (True=135.0m3),PASS,"recovered_dV=135.07 m3 from starts [45, 210] (abs_err=0.07 m3)"
+5_Tamper_Future_Zero_Leakage_Causality_Test (Incl_Q1_Basis),PASS,"max_feat_diff=0.000000e+00, max_ksrc_diff=0, max_pred_diff=0.000000e+00"
+6_Cross_Heat_Nested_Fold_Zero_Leakage_Test,PASS,max_train_artifact_diff_under_corrupted_test_heat=0.000000e+00

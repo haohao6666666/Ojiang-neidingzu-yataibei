@@ -4,3 +4,7 @@ B_results/data_raw/csv/
 B_results/data_raw/_extract/
 B_results/data_raw/*.npz
 B_results/data_clean/
+
+# v4 pipeline runtime cache
+solution_v4_verified/solution_outputs/cache/
+__pycache__/
