@@ -262,13 +262,20 @@ def _solve_pfr_subproblem(
     sub_items: List[Tuple[np.ndarray, float, np.ndarray, np.ndarray]],
     t_mix_s: float,
     starts: List[List[float]],
-    maxiter: int = 110,
+    maxiter: int = 180,
     w_end_fixed: float = 180.0,
 ) -> Tuple[np.ndarray, float]:
+    """
+    在 O(1) 无量纲缩放空间 u = params / scales 内执行有界 L-BFGS-B 寻优：
+    彻底消除 5 参数跨 4 个数量级 (0.15 vs 3600) 导致的有限差分梯度病态与跨 SciPy 版本过早停机问题。
+    """
     precomp = [(o2_c, float(np.exp(-dt_s / t_mix_s)), cox, val) for o2_c, dt_s, cox, val in sub_items]
+    scales = np.array([100.0, 0.20, 500.0, 150.0, 3500.0], dtype=np.float64)
+    raw_bounds = [(25.0, 250.0), (0.01, 0.48), (160.0, 1150.0), (35.0, 420.0), (2950.0, 4600.0)]
+    u_bounds = [(lo / s, hi / s) for (lo, hi), s in zip(raw_bounds, scales)]
 
-    def loss(params: np.ndarray) -> float:
-        v_pipe, eta_ign, v_main, w_main, v_end = params
+    def loss_u(u: np.ndarray) -> float:
+        v_pipe, eta_ign, v_main, w_main, v_end = u * scales
         tot = 0.0
         for o2_c, a, cox, val in precomp:
             v_s = o2_c - v_pipe
@@ -276,22 +283,24 @@ def _solve_pfr_subproblem(
             v_pos = np.maximum(v_s, 0.0)
             sig_m = 1.0 / (1.0 + np.exp(-np.clip((v_pos - v_main) / w_main, -40.0, 40.0)))
             sig_e = 1.0 / (1.0 + np.exp(np.clip((v_pos - v_end) / w_end_fixed, -40.0, 40.0)))
-            u = gate_on * (eta_ign + (1.0 - eta_ign) * sig_m) * sig_e
-            ys = lfilter([1.0 - a], [1.0, -a], u)
+            u_sig = gate_on * (eta_ign + (1.0 - eta_ign) * sig_m) * sig_e
+            ys = lfilter([1.0 - a], [1.0, -a], u_sig)
             ym, yt = ys[val], cox[val]
             sc = float(np.dot(ym, yt) / (np.dot(ym, ym) + 1e-12))
             tot += 1.0 - float(r2_score(yt, sc * ym))
         return tot / len(precomp)
 
-    bounds = [(25.0, 250.0), (0.01, 0.48), (160.0, 1150.0), (35.0, 420.0), (2950.0, 4600.0)]
     best_res = None
     for x0 in starts:
-        res = minimize(loss, x0=np.asarray(x0, dtype=np.float64), method="L-BFGS-B",
-                       bounds=bounds, options={"maxiter": maxiter, "ftol": 1e-8})
+        u0 = np.asarray(x0, dtype=np.float64) / scales
+        res = minimize(
+            loss_u, x0=u0, method="L-BFGS-B", bounds=u_bounds,
+            options={"maxiter": maxiter, "ftol": 1e-12, "gtol": 1e-8, "eps": 1e-5},
+        )
         if best_res is None or res.fun < best_res.fun:
             best_res = res
     assert best_res is not None
-    return best_res.x.copy(), 1.0 - float(best_res.fun)
+    return (best_res.x * scales).copy(), 1.0 - float(best_res.fun)
 
 
 def fit_pfr_kinetics(
@@ -317,11 +326,11 @@ def fit_pfr_kinetics(
         [115.0, 0.16, 520.0, 160.0, 3650.0],
         [195.0, 0.28, 320.0, 95.0, 3950.0],
     ]
-    x_opt, mean_r2 = _solve_pfr_subproblem(items_main, t_mix_s=t_mix, starts=starts, maxiter=120)
+    x_opt, mean_r2 = _solve_pfr_subproblem(items_main, t_mix_s=t_mix, starts=starts, maxiter=180)
 
     ci_lo, ci_hi = float(x_opt[0]), float(x_opt[0])
     if run_bootstrap and len(indices) >= 4:
-        # 2.0 s 光滑采样网格上执行 250 次双初值全参数联合重拟合 Bootstrap
+        # 2.0 s 光滑采样网格上执行 250 次双初值全参数联合重拟合 Bootstrap（归一化 L-BFGS-B 约 20 步收敛）
         sub_2s = _prepare_subsampled_cache(recons, grid_dt_s=2.0)
         pool_2s = [sub_2s[i] for i in indices]
         rng = np.random.default_rng(SEED)
@@ -333,7 +342,7 @@ def fit_pfr_kinetics(
         n_pool = len(pool_2s)
         for _ in range(Q2_CFG.bootstrap_iters):
             draw = rng.integers(0, n_pool, size=n_pool)
-            xb, _ = _solve_pfr_subproblem([pool_2s[k] for k in draw], t_mix_s=t_mix, starts=boot_starts, maxiter=38)
+            xb, _ = _solve_pfr_subproblem([pool_2s[k] for k in draw], t_mix_s=t_mix, starts=boot_starts, maxiter=100)
             boot_vp.append(float(xb[0]))
         ci_lo = float(np.percentile(boot_vp, 2.5))
         ci_hi = float(np.percentile(boot_vp, 97.5))
