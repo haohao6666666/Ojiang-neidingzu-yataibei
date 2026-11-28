@@ -38,11 +38,8 @@ FIGURE_LEAD_INS = {
     10: r"\ifpaperappendix The remaining nine process plots are in Appendix~\ref{app:heat-figures}.\fi",
     11: r"Figure~\ref{fig:11} shows the piecewise fits for the ten heats.",
 }
-PREPROCESSING_CAPTION = (
-    "**Data preprocessing workflow.** Five preprocessing steps resolve four data "
-    "inconsistencies and align the wavelength grid."
-)
-LOHO_ENDPOINT_CAPTION = " Circles mark the last plotted sample of each series."
+PREPROCESSING_CAPTION = "Five-step data preprocessing and consistency workflow."
+LOHO_ENDPOINT_CAPTION = ""
 ESCAPE = str.maketrans({"#": r"\#", "%": r"\%", "&": r"\&", "_": r"\_", "~": r"\textasciitilde{}",
                         "{": r"\{", "}": r"\}", "\\": r"\textbackslash{}", "^": r"\textasciicircum{}",
                         "−": r"\ensuremath{-}", "±": r"\ensuremath{\pm}",

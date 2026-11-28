@@ -10,7 +10,7 @@ Figure~\ref{fig:1} shows the two measurement locations.
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.7\linewidth]{figures/fig01_dual_modal_schematic.pdf}
-\caption{\textbf{Dual-modal measurement at the converter.} The spectrometer observes the flame in real time; the analyzer observes the same reactions after the gas has crossed the duct volume $\Delta V_{\mathrm{pipe}}$.}\label{fig:1}
+\caption{Dual-modal sensing layout of the basic oxygen converter.}\label{fig:1}
 \end{figure}
 
 \subsection{Restatement of the Problem}\label{sec:1.2}
@@ -31,7 +31,7 @@ Figure~\ref{fig:2} outlines our workflow. We first diagnose the data and resolve
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=1.0\linewidth]{figures/fig02_framework.pdf}
-\caption{\textbf{Framework of our work.} The low-rank spectral structure of Task 1 and the delay model of Task 2 feed the soft sensor of Task 3.}\label{fig:2}
+\caption{Integrated modeling framework across Tasks 1–3.}\label{fig:2}
 \end{figure}
 
 
@@ -89,7 +89,7 @@ Each attachment contains about 1,400 spectra of 2,047 wavelengths and the corres
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=1.0\linewidth]{figures/fig03_preprocessing_workflow.pdf}
-\caption{\textbf{Data preprocessing workflow.} Five preprocessing steps resolve four data inconsistencies and align the wavelength grid.}\label{fig:3}
+\caption{Five-step data preprocessing and consistency workflow.}\label{fig:3}
 \end{figure}
 
 \begin{table}[!htbp]
@@ -131,43 +131,49 @@ We first apply isotonic regression to keep $V(t)$ non-decreasing. We then estima
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=1.0\linewidth]{figures/fig04_o2_counter_beat.pdf}
-\caption{\textbf{Beat artifact of the oxygen counter (Heat 3).} (a) Counter increments in a 60-s window of the main blow: single steps of 4.72 m\ensuremath{^{3}} and double steps about every 11.5 s. (b) Lance flow estimated by regression slopes over 5-s, 12-s and 24-s windows; SD denotes the residual standard deviation after detrending.}\label{fig:4}
+\caption{Oxygen-counter beat artifact in Heat 3: (a) counter increments; (b) sliding-window flow slopes.}\label{fig:4}
 \end{figure}
 
 \subsection{Carbon–Oxygen Balance Check}\label{sec:3.4}
 
-The problem describes the CO and CO\ensuremath{_{2}} values as volume flow rates in m\ensuremath{^{3}}/s. We test this reading with a carbon–oxygen balance. Producing one volume of CO consumes half a volume of O\ensuremath{_{2}}, and producing one volume of CO\ensuremath{_{2}} consumes one volume of O\ensuremath{_{2}}. If the values were flow rates, the oxygen needed by the measured gas would be $0.5E_{\mathrm{CO}} + E_{\mathrm{CO_2}}$. Figure~\ref{fig:5} shows that this amount equals 5.46–6.53 times the oxygen actually supplied, with a mean of 5.92 and a coefficient of variation of 6.5\%.
+The problem describes the CO and CO\ensuremath{_{2}} values as volume flow rates in m\ensuremath{^{3}}/s. We test this reading with a carbon–oxygen balance. Producing one volume of CO consumes half a volume of O\ensuremath{_{2}}, and producing one volume of CO\ensuremath{_{2}} consumes one volume of O\ensuremath{_{2}}. Under the flow-rate interpretation, the apparent ratio of stoichiometric oxygen demand to blown oxygen supply is
 
-The ratio cannot exceed one if the values are flow rates. During the main blow, however, $y_{\mathrm{CO}} + y_{\mathrm{CO_2}}$ stays between 49 and 61 and remains at or below 72, which matches typical converter off-gas composition in percent by volume. We therefore interpret the readings as volume fractions. The cumulative emissions required by Task 2 are still computed as time integrals of the readings, and our later conclusions rely on relative changes rather than on absolute gas volumes. If all blown oxygen leaves the bath as CO and CO\ensuremath{_{2}}, the stable ratio across heats implies an effective diluted flue-gas flow of about 16.9 m\ensuremath{^{3}}/s. Its narrow spread also indicates that the measurement chain behaves consistently across heats, supporting a common delay model.
+\begin{equation}
+\alpha_{\mathrm{app}} = \frac{0.5\,E_{\mathrm{CO}}(t_{\mathrm{end}}) + E_{\mathrm{CO_2}}(t_{\mathrm{end}})}{V(t_{\mathrm{end}})}, \label{eq:massbal}
+\end{equation}
+
+where $t_{\mathrm{end}}$ denotes the end of the blow. Figure~\ref{fig:5} shows that $\alpha_{\mathrm{app}}$ lies between 5.46 and 6.53 across all ten heats, with a mean of 5.92 and a coefficient of variation of 6.5\%.
+
+The ratio in Equation~(\ref{eq:massbal}) cannot exceed one if the readings are flow rates. During the main blow, however, $y_{\mathrm{CO}} + y_{\mathrm{CO_2}}$ stays between 49 and 61 and remains at or below 72, which matches typical converter off-gas composition in percent by volume. We therefore interpret the readings as volume fractions. The cumulative emissions required by Task 2 are still computed as time integrals of the readings, and our later conclusions rely on relative changes rather than on absolute gas volumes. If all blown oxygen leaves the bath as CO and CO\ensuremath{_{2}}, the stable ratio across heats implies an effective diluted flue-gas flow of about 16.9 m\ensuremath{^{3}}/s. Its narrow spread also indicates that the measurement chain behaves consistently across heats, supporting a common delay model.
 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.7\linewidth]{figures/fig05_carbon_oxygen_balance.pdf}
-\caption{\textbf{Carbon–oxygen balance under the flow-rate reading.} The oxygen required by the measured CO and CO\ensuremath{_{2}} exceeds the supplied oxygen by a factor of 5.5–6.5 in every heat, so the readings are volume fractions.}\label{fig:5}
+\caption{Carbon–oxygen mass-balance ratio across the ten heats.}\label{fig:5}
 \end{figure}
 
 
 \FloatBarrier
 \section{Delay-Aware Dual-Modal Framework}\label{sec:4}
 
-The three tasks share one question: at what time does the analyzer report the gas that the bath produces now? We answer it with an arrival-time map. Let $V(t)$ be the cumulative oxygen. Under Assumption 1, a parcel of gas generated at time $t$ reaches the analyzer when the gas generated after it has filled the duct. Under Assumption 2, the gas flow is proportional to the lance flow, so this condition can be written in oxygen units:
+All three tasks hinge on synchronizing an instantaneous optical observation at the furnace mouth with its delayed chemical signature at the gas analyzer. We formalize this coupling through a Lagrangian arrival-time map indexed by cumulative oxygen consumption $V(t)$. Under Assumption 1, each fluid element exits the exhaust hood and traverses the ductwork in sequence with minimal axial back-mixing, so it arrives at the sampling bend once the cumulative off-gas volume formed after time $t$ equals the effective duct capacity. Because Assumption 2 links off-gas production linearly to the oxygen injection rate $Q(t)$, that residence-volume balance translates directly into an oxygen-volume conservation law:
 
 \begin{equation}
 \int_{t}^{t_{\mathrm{arr}}(t)} Q(s)\,\mathrm{d}s = V\bigl(t_{\mathrm{arr}}(t)\bigr) - V(t) = \Delta V_{\mathrm{pipe}}. \label{eq:1}
 \end{equation}
 
-Equation~(\ref{eq:1}) uses cumulative oxygen as the physical clock of the duct and holds under time-varying flow. For a mean transit flow $\bar{Q}$, the plug-flow transport time equals $\Delta V_{\mathrm{pipe}}/\bar{Q}$, so $t_{\mathrm{arr}}(t)$ marks the earliest arrival of a gas parcel before axial dispersion. Adding a first-order mixing stage with time constant $T_{\mathrm{mix}}$ introduces an extra mean lag of $T_{\mathrm{mix}}$, giving the total delay at steady flow $Q$:
+Here $\Delta V_{\mathrm{pipe}}$ denotes the effective duct capacity expressed in equivalent cubic metres of blown oxygen, turning $V(t)$ into an intrinsic process clock valid under arbitrary lance-flow trajectories. Across any transit interval with average flow $\bar{Q}$, advection requires $\Delta V_{\mathrm{pipe}}/\bar{Q}$ seconds, defining the pure transport arrival $t_{\mathrm{arr}}(t)$. Incorporating a first-order mixing element of time constant $T_{\mathrm{mix}}$ to account for residual axial dispersion and analyzer response shifts the mean arrival by an additional $T_{\mathrm{mix}}$ seconds, yielding the steady-flow delay relation:
 
 \begin{equation}
 \tau(Q) = T_{\mathrm{mix}} + \frac{\Delta V_{\mathrm{pipe}}}{Q}. \label{eq:2}
 \end{equation}
 
-Equation~(\ref{eq:2}) casts the delay–flow relation of Task 2 in a directly testable form: total delay decreases as flow rises, and its excess over $T_{\mathrm{mix}}$ scales inversely with $Q$. This transport map also anchors the other two tasks. It defines the real-time prediction target as $y\bigl(t_{\mathrm{arr}}(t)\bigr)$ and tells the online corrector which past prediction a new probe reading verifies. Finally, it establishes cumulative oxygen as a natural coordinate for cross-heat comparison: two heats with equal oxygen consumption have reached the same blowing stage even when their flow profiles differ (Figure~\ref{fig:6}).
+Equation~(\ref{eq:2}) renders the flow dependence required in Task 2 directly identifiable: total lag falls monotonically as lance flow rises, with its advection component scaling inversely with $Q$. Simultaneously, Equation~(\ref{eq:1}) unifies the remaining tasks by pairing each live spectral frame at $t$ with its future ground-truth target $y\bigl(t_{\mathrm{arr}}(t)\bigr)$, identifying which earlier forecast each incoming probe measurement validates, and aligning heats with disparate blowing rates onto a common cumulative-oxygen progress axis (Figure~\ref{fig:6}).
 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.8\linewidth]{figures/fig06_arrival_time_map.pdf}
-\caption{\textbf{Arrival-time map.} The duct must be refilled by $\Delta V_{\mathrm{pipe}}$ before the gas generated at $t$ reaches the analyzer, so a larger lance flow gives a shorter delay.}\label{fig:6}
+\caption{Plug-flow arrival-time map under ignition and main-blow lance flows.}\label{fig:6}
 \end{figure}
 
 
@@ -188,9 +194,21 @@ A flame spectrum is a smooth thermal continuum with a few emission lines. As the
 \mathbf{X} = \mathbf{L} + \mathbf{S} + \mathbf{N}, \qquad \operatorname{rank}(\mathbf{L}) \le r, \label{eq:3}
 \end{equation}
 
-where $\mathbf{S}$ captures sparse outliers and $\mathbf{N}$ denotes small background noise. Classical principal component pursuit \cite{ref:1} fails to separate the noise here, yielding ranks of 426–446 in every heat. We therefore fix the rank and alternate two projections \cite{ref:2}. Given $\mathbf{S}$, we set $\mathbf{L}$ to the rank-$r$ truncated SVD approximation of $\mathbf{X}-\mathbf{S}$; given $\mathbf{L}$, we retain in $\mathbf{S}$ the residuals exceeding five times a robust scale. Iteration terminates once the outlier set stabilizes.
+where $\mathbf{S}$ captures sparse outliers and $\mathbf{N}$ denotes small background noise. Classical principal component pursuit \cite{ref:1} fails to separate the noise here, yielding ranks of 426–446 in every heat. We therefore fix the rank and alternate two projections \cite{ref:2}:
 
-\textbf{Step 3: Outlier rules.} The robust scale $\sigma_\lambda$ is estimated separately for each wavelength, because the ultraviolet and near-infrared ends carry fewer counts and more noise. A pixel is an outlier if $|X_{t\lambda}-L_{t\lambda}| > 5\sigma_\lambda$. A frame is anomalous if its mean standardized residual has a robust z-score above 5. Within such a frame, we remove only the pixels with $|z|>2.5$ and keep the rest, so that the frame still determines its own low-rank scores. A run longer than 5 s is treated as a change of operation, such as the end of the blow, rather than as an outlier.
+\begin{equation}
+\mathbf{L}^{(m)} = \mathcal{P}_r\!\bigl(\mathbf{X}-\mathbf{S}^{(m-1)}\bigr), \qquad S^{(m)}_{t\lambda} = \bigl(X_{t\lambda}-L^{(m)}_{t\lambda}\bigr)\,\mathbb{1}\!\bigl(\lvert X_{t\lambda}-L^{(m)}_{t\lambda}\rvert > 5\sigma_\lambda\bigr), \label{eq:rlr_alt}
+\end{equation}
+
+where $\mathcal{P}_r(\cdot)$ denotes the rank-$r$ truncated singular value decomposition and $\sigma_\lambda$ is the wavelength-specific robust residual scale. Iteration terminates once the outlier support stabilizes.
+
+\textbf{Step 3: Outlier rules.} We estimate $\sigma_\lambda$ separately at each wavelength via the scaled median absolute deviation, because the ultraviolet and near-infrared ends carry fewer counts and more noise. A pixel is flagged if $|X_{t\lambda}-L_{t\lambda}| > 5\sigma_\lambda$. Let $\bar{e}_t$ be the mean clipped standardized residual across wavelengths in frame $t$; the frame is flagged as anomalous when its robust z-score satisfies
+
+\begin{equation}
+Z_t = \frac{\bar{e}_t - \operatorname{med}(\bar{e})}{1.4826\,\operatorname{MAD}(\bar{e})} > 5. \label{eq:frame_z}
+\end{equation}
+
+Within an anomalous frame, we remove only the pixels with $|z|>2.5$ and keep the rest, so that the frame still determines its own low-rank scores. A run longer than 5 s is treated as a change of operation, such as the end of the blow, rather than as an outlier.
 
 \textbf{Step 4: Continuous surface.} After removing outliers, we complete the matrix with rank $r$ and write
 
@@ -213,7 +231,7 @@ Figure~\ref{fig:7} shows the decomposition for Heat 3. The low-rank part keeps t
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=1.0\linewidth]{figures/fig07_rlr_decomposition.pdf}
-\caption{\textbf{Low-rank plus sparse decomposition of Heat 3.} The low-rank part carries the evolution of the blow; the sparse part concentrates on the emission lines near 767 nm and 589 nm.}\label{fig:7}
+\caption{RLR decomposition of Heat 3: (a) raw log spectrum; (b) low-rank component; (c) sparse residual.}\label{fig:7}
 \end{figure}
 
 We test the detector by injecting known outliers into clean spectra of Heats 3 and 8. Spikes of 5–10 robust standard deviations hit 1\% of the pixels, and Gaussian bumps of 0.2–0.5 in log intensity distort 1\% of the frames. Table~\ref{tab:3} compares RLR with a one-dimensional Hampel filter \cite{ref:3}; higher F1 and lower error are better. RLR finds 93\% of the spikes with a precision of 87\%, while the Hampel filter mistakes flicker for spikes and misses most of them. The Hampel filter also cannot recognize distorted frames, because it judges each frame by its total intensity. Removing the detected outliers lowers the reconstruction error on the corrupted pixels from 0.068 to 0.041.
@@ -259,7 +277,7 @@ When whole frames are hidden, every method reaches an error of about 0.36 (RLR: 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=1.0\linewidth]{figures/fig08_outlier_reconstruction.pdf}
-\caption{\textbf{Outlier detection and reconstruction (Heat 9).} (a) Intensity at 600 nm with the flagged outliers, the continuous reconstruction and the trend surface; the dotted line marks the frame shown in (b). (b) An anomalous bright frame at 9.14 min, partly saturated, rebuilt by RLR from its retained pixels.}\label{fig:8}
+\caption{Outlier detection and reconstruction in Heat 9: (a) 600 nm series; (b) anomalous bright frame at 9.14 min.}\label{fig:8}
 \end{figure}
 
 \subsubsection{Continuous 3D Spectral Surfaces}\label{sec:5.2.3}
@@ -270,7 +288,7 @@ Figure~\ref{fig:9} presents the continuous spectral surfaces of the ten heats. A
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=1.0\linewidth]{figures/fig09_spectral_surfaces.pdf}
-\caption{\textbf{Continuous spectral surfaces of the ten heats (trend surfaces, log\ensuremath{_{10}} intensity).} Every heat shows ignition, a main-blow plateau and an end-of-blow decline; the 6C heats are brighter.}\label{fig:9}
+\caption{Continuous 3D spectral trend surfaces of the ten heats ($\log_{10}$ intensity).}\label{fig:9}
 \end{figure}
 
 
@@ -282,7 +300,13 @@ Task 2 contains three questions of increasing depth: how to recover continuous p
 
 \subsection{Continuous Reconstruction of the Process Signals}\label{sec:6.1}
 
-The lance flow $Q(t)$ comes from the 24-s regression slope of Section~\ref{sec:3.3}, and $V(t)$ is the monotone cubic interpolation of the counter updates. For the gas readings, we remove two kinds of outliers. Stuck readings are runs that stay constant for more than 10 s during the active blow; we find five such runs of 22–94 points. Spikes are detected by a Hampel filter applied to the sequence of value updates, with a floor equal to the measurement noise, which flags at most four points per heat. The cleaned readings are reconstructed by monotone cubic interpolation followed by a smoothing spline. Hiding 10\% of the updates gives a reconstruction error of 0.20 for CO (mean 31.0) and 0.10 for CO\ensuremath{_{2}} (mean 13.8), both below 1\%. The cumulative emissions are the trapezoidal integrals of the reconstructed readings.
+The lance flow $Q(t)$ comes from the 24-s regression slope of Section~\ref{sec:3.3}, and $V(t)$ is the monotone cubic interpolation of the counter updates. For the gas readings, we remove two kinds of outliers. Stuck readings are runs that stay constant for more than 10 s during the active blow; we find five such runs of 22–94 points. Spikes are detected by a Hampel filter applied to the sequence of value updates, with a floor equal to the measurement noise, which flags at most four points per heat. The cleaned readings are reconstructed by monotone cubic interpolation followed by a smoothing spline. Hiding 10\% of the updates gives a reconstruction error of 0.20 for CO (mean 31.0) and 0.10 for CO\ensuremath{_{2}} (mean 13.8), both below 1\%. From the continuous curves, the lance flow and cumulative gas emissions follow directly as
+
+\begin{equation}
+Q(t) = \frac{\mathrm{d}V(t)}{\mathrm{d}t}, \qquad E_g(t) = \int_{0}^{t} y_g(s)\,\mathrm{d}s, \qquad g \in \{\mathrm{CO},\,\mathrm{CO_2}\}, \label{eq:cum_emiss}
+\end{equation}
+
+evaluated numerically via the 24-s sliding slope for $Q(t)$ and trapezoidal integration for $E_g(t)$.
 
 Figure~\ref{fig:10} shows the six curves of Heat 3. The flow holds at about 2.4 m\ensuremath{^{3}}/s during ignition, steps up to about 4.8 m\ensuremath{^{3}}/s in the main blow and rises again near the end. CO\ensuremath{_{2}} peaks within the first three minutes, whereas CO rises later and stays high until the end of the blow. The cumulative emissions therefore grow in opposite orders: the CO\ensuremath{_{2}} curve rises early and flattens, and the CO curve starts slowly and steepens.
 
@@ -290,14 +314,20 @@ Figure~\ref{fig:10} shows the six curves of Heat 3. The flow holds at about 2.4 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=1.0\linewidth]{figures/fig10_process_curves_heat03.pdf}
-\caption{\textbf{Continuous process curves of Heat 3:} (a) lance flow, (b) cumulative oxygen, (c, d) CO\ensuremath{_{2}} and CO readings in vol.\%, and (e, f) their cumulative emissions in 10\ensuremath{^{3}} vol.\%·s. CO\ensuremath{_{2}} peaks early and CO late; shading marks the four blowing stages I–IV.}\label{fig:10}
+\caption{Continuous process curves of Heat 3: (a) lance flow; (b) cumulative oxygen; (c, d) gas readings; (e, f) cumulative emissions.}\label{fig:10}
 \end{figure}
 
 \subsection{Four-Stage Relationship between Oxygen and Off-Gas}\label{sec:6.2}
 
 We describe the gas readings as functions of the cumulative oxygen $V$ rather than of time, because $V$ measures how far the blow has progressed. The rank correlations show why a single global trend is insufficient. Averaged over the ten heats, CO correlates with $V$ at $\rho = 0.74$, whereas CO\ensuremath{_{2}} correlates at $\rho = -0.13$. After a cubic time trend is removed, the CO correlation drops to 0.38, so much of the relation is a stage effect rather than a smooth proportionality. The cumulative emissions correlate with $V$ at $\rho \approx 1.00$, but only because all three quantities increase with time.
 
-For each heat, we therefore fit $y_{\mathrm{CO}}(V)$ with a continuous piecewise-linear function with three breakpoints. A grid search locates the breakpoints, with the second one before 60\% and the third one after 75\% of the total oxygen. The fits reach $R^2 = 0.956$–$0.997$. Table~\ref{tab:5} lists the results.
+For each heat, we therefore model $y_{\mathrm{CO}}(V)$ with a continuous three-breakpoint piecewise-linear function:
+
+\begin{equation}
+y_{\mathrm{CO}}(V) = \beta_0 + \beta_1 V + \sum_{m=1}^{3} \delta_m\,(V - V_m)_{+}, \label{eq:piecewise}
+\end{equation}
+
+where $(x)_+ = \max(x,0)$, $\delta_m$ gives the slope change at breakpoint $V_m$, and a grid search places $V_2$ before 60\% and $V_3$ after 75\% of total oxygen. The fits reach $R^2 = 0.956$–$0.997$. Table~\ref{tab:5} lists the results.
 
 \begin{table}[!htbp]
 \centering\small
@@ -307,10 +337,10 @@ For each heat, we therefore fit $y_{\mathrm{CO}}(V)$ with a continuous piecewise
 \toprule
 \textbf{Stage} & \textbf{Range of $V/V_{\mathrm{end}}$} & \textbf{CO share in CO+CO\ensuremath{_{2}}} & \textbf{Mean slope of $y_{\mathrm{CO}}$ (per m\ensuremath{^{3}})} \\
 \midrule
-I. Early blow (CO\ensuremath{_{2}}-dominated) & 0 – 0.23 \ensuremath{\pm} 0.02 & 9.5–28.9\% & 0.012 \\
-II. Decarburization ramp-up & – 0.43 \ensuremath{\pm} 0.06 & 51.0–61.3\% & 0.055 \\
-III. Steady decarburization & – 0.90 \ensuremath{\pm} 0.08 & 72.7–80.6\% & \ensuremath{-}0.002 \\
-IV. End-of-blow decline & – 1 & 57.8–84.7\% & \ensuremath{-}0.082 \\
+I. Early blow (CO\ensuremath{_{2}}-dominated) & 0–0.23 (\ensuremath{\pm}0.02) & 9.5–28.9\% & 0.012 \\
+II. Decarburization ramp-up & 0.23–0.43 (\ensuremath{\pm}0.06) & 51.0–61.3\% & 0.055 \\
+III. Steady decarburization & 0.43–0.90 (\ensuremath{\pm}0.08) & 72.7–80.6\% & \ensuremath{-}0.002 \\
+IV. End-of-blow decline & 0.90–1.00 & 57.8–84.7\% & \ensuremath{-}0.082 \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -321,7 +351,7 @@ Figure~\ref{fig:11} shows the piecewise fits for the ten heats.
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=1.0\linewidth]{figures/fig11_four_stage_relation.pdf}
-\caption{\textbf{CO and CO\ensuremath{_{2}} versus cumulative oxygen for the ten heats.} Three breakpoints (dots) divide every blow into the same four stages (shading); dashed lines are the piecewise-linear fits of CO.}\label{fig:11}
+\caption{Four-stage piecewise-linear CO and CO\ensuremath{_{2}} trajectories against cumulative oxygen.}\label{fig:11}
 \end{figure}
 
 \subsection{Plug-Flow Delay Model (PFD)}\label{sec:6.3}
@@ -336,7 +366,13 @@ u(V) = g(V)\,\bigl[\eta + (1-\eta)\,s\bigl((V^{+}-V_{\mathrm{m}})/w_{\mathrm{m}}
 
 where $s(\cdot)$ is the logistic function and $g(V) = s\bigl((V-\Delta V_{\mathrm{pipe}})/3.5\bigr)$ switches the signal on when the first gas arrives. The parameter $\eta$ sets the ignition level, $(V_{\mathrm{m}}, w_{\mathrm{m}})$ locates the main-blow rise, and $V_{\mathrm{e}}$ locates the end-of-blow decline with a transition width $w_{\mathrm{e}}$ fixed at 180 m\ensuremath{^{3}}.
 
-\textbf{Step 2: Mixing and scaling.} A first-order filter with time constant $T_{\mathrm{mix}}$ converts $u$ into the modelled reading, and a heat-specific factor scales it to the data.
+\textbf{Step 2: Mixing and scaling.} A first-order mixing stage with time constant $T_{\mathrm{mix}}$ maps the shifted curve $u$ to the modelled oxygen-equivalent response $\tilde{y}_{\mathrm{ox}}$ via
+
+\begin{equation}
+y_{\mathrm{ox}}(t) = y_{\mathrm{CO_2}}(t) + 0.5\,y_{\mathrm{CO}}(t), \qquad T_{\mathrm{mix}}\,\frac{\mathrm{d}\tilde{y}_{\mathrm{ox}}}{\mathrm{d}t} + \tilde{y}_{\mathrm{ox}}(t) = c_k\,u\bigl(V(t)\bigr), \label{eq:pfd_mix}
+\end{equation}
+
+where $c_k$ is a heat-specific scale factor fitted linearly against the observed $y_{\mathrm{ox}}(t)$.
 
 \textbf{Step 3: Estimation.} We minimize the mean of $1-R^2$ over the heats with L-BFGS-B \cite{ref:5} from three starting points far from each other. Because the five parameters differ by four orders of magnitude, we rescale them to unit size before optimization. We fix the mixing constant $T_{\mathrm{mix}}$ at 5 s, because fits with 2, 5 and 10 s reach the same $R^2$ (0.9754–0.9760). The uncertainty of $\Delta V_{\mathrm{pipe}}$ comes from 250 bootstrap resamples of whole heats \cite{ref:6}, each refitting all five parameters. A synthetic test checks the estimator: data generated with $\Delta V_{\mathrm{pipe}} = 135$ m\ensuremath{^{3}} and noise are fitted from blind starting points of 45 and 210 m\ensuremath{^{3}}, and the estimate returns 135.3 m\ensuremath{^{3}}.
 
@@ -375,7 +411,7 @@ Table~\ref{tab:6} evaluates Equation~(\ref{eq:6}) at typical flows. At the ignit
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=1.0\linewidth]{figures/fig12_plug_flow_delay.pdf}
-\caption{\textbf{Plug-flow delay model.} (a) $\tau(Q)$ with the 95\% bootstrap band and the ignition and main-blow onset events. (b) Oxygen-equivalent readings of the ten heats collapse onto one trajectory in the oxygen coordinate. (c) Recalibrating $\Delta V_{\mathrm{pipe}}$ without each heat gives 127.1 \ensuremath{\pm} 0.9 m\ensuremath{^{3}}, inside the full-data 95\% bootstrap interval (shading).}\label{fig:12}
+\caption{Plug-flow delay model: (a) delay curve $\tau(Q)$; (b) oxygen-equivalent trajectory collapse; (c) leave-one-heat-out $\Delta V_{\mathrm{pipe}}$.}\label{fig:12}
 \end{figure}
 
 \subsubsection{Validation against Main-Blow Onset Events}\label{sec:6.4.2}
@@ -406,7 +442,7 @@ First gas after ignition (upper bound) & 2.35 & median 49.8 \\
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.7\linewidth]{figures/fig13_windowed_delay_vs_flow.pdf}
-\caption{\textbf{Windowed delay estimates versus lance flow.} Dots are 44 window estimates and squares are the medians of four flow bins with interquartile ranges; the curve is the PFD model of Equation~(\ref{eq:6}).}\label{fig:13}
+\caption{Windowed cross-correlation delay estimates versus lance flow with PFD fit.}\label{fig:13}
 \end{figure}
 
 The windowed estimates fall faster with the flow than $1/Q$ does. This suggests that the duct volume is not the only factor; a higher flow may also enhance mixing and post-combustion in the hood. In the main-blow flow range of 4.4–6.6 m\ensuremath{^{3}}/s, Equation~(\ref{eq:6}) gives 24–34 s. These values stay below the two event-based upper bounds and agree with the constant delay of 31 s that maximizes spectral predictability. We therefore adopt Equation~(\ref{eq:6}) as the delay model for Task 3 and test the consequence of a \ensuremath{\pm}10\% error in $\Delta V_{\mathrm{pipe}}$ in Section~\ref{sec:8}.
@@ -423,11 +459,23 @@ At time $t$, the flame reflects the bath state at $t$, whereas the analyzer repo
 
 All features use measurements up to time $t$ only. For each frame, we subtract the ultraviolet dark baseline below 385 nm, smooth along wavelength and resample onto 127 points between 380 and 1010 nm to trim noisy spectral edges. RLR serves the offline analysis of Task 1, where saturated pixels are simply filled. An online predictor should also respect that a saturated pixel lies above the detector limit. We therefore clean the training spectra with a censoring-aware variant of the same low-rank idea. It applies a soft-thresholded rank-12 SVD to the log spectra, keeps every filled saturated pixel at or above the saturation level and then smooths along wavelength\ifpaperappendix\ (Appendix~\ref{app:code})\fi. We pool the cleaned spectra of all training heats and both converters and extract an eight-dimensional basis. It is wider than the three components of a single heat because it must also cover the differences between heats and converters. Projecting each new frame onto this basis (excluding saturated pixels) compresses 127 correlated channels into eight scores.
 
-Three physical descriptors complement the scores. We derive a colour temperature from the Wien approximation: across three line-free continuum windows (480–575, 610–750 and 785–960 nm), the slope of $\ln(I\lambda^{5})$ versus $1/\lambda$ equals $-c_2/T_{\mathrm{c}}$ with $c_2 = 14{,}388$ µm·K. Spectral centroid and spectral entropy further quantify where and how broadly the radiation distributes. Causal exponential moving averages at 5, 25, 80 and 200 s capture both flicker-suppressed instantaneous levels and stage-scale trends, while causal process features supply $V(t)$, lance flow and blowing progress.
+Three physical descriptors complement the scores: spectral centroid, spectral entropy, and a Wien colour temperature $T_{\mathrm{c}}(t)$ estimated across three line-free continuum windows (480–575, 610–750 and 785–960 nm) with $c_2 = 14{,}388$ µm·K. To suppress rapid flicker while preserving multi-scale trends causally, each descriptor $f(t)$ is smoothed by exponential moving averages at timescales of 5, 25, 80 and 200 s:
+
+\begin{equation}
+\ln\!\bigl(I(t,\lambda)\lambda^{5}\bigr) = a_0(t) - \frac{c_2}{T_{\mathrm{c}}(t)}\,\frac{1}{\lambda}, \qquad \bar{f}_{\gamma}(t) = \gamma\,f(t) + (1-\gamma)\,\bar{f}_{\gamma}(t-\Delta t), \label{eq:wien_ema}
+\end{equation}
+
+where $\gamma = 1 - \exp(-\Delta t / \tau_{\mathrm{ema}})$ sets each causal decay rate, and causal process features further supply $V(t)$, lance flow and blowing progress.
 
 \subsection{Dual-Modal Soft Sensor (DSS)}\label{sec:7.2}
 
-\textbf{Step 1: Linear-tree predictor.} A ridge regression on bounded linear features captures global trends and supports extrapolation beyond the training range. This matters for Heat 1, whose CO reading is the highest of all heats between 30\% and 65\% of the total oxygen and peaks at 59 near the middle of the blow. Gradient-boosted trees \cite{ref:7} then model the residual nonlinearity.
+\textbf{Step 1: Linear-tree predictor.} Pure tree ensembles cannot extrapolate beyond the training range, which matters for Heat 1 because its CO reading is the highest of all heats between 30\% and 65\% of total oxygen and peaks at 59 near mid-blow. We therefore combine a ridge linear head on bounded features with gradient-boosted residual trees \cite{ref:7}:
+
+\begin{equation}
+\hat{y}(t) = \hat{\boldsymbol{\beta}}^{\top}\mathbf{x}_{\mathrm{lin}}(t) + f_{\mathrm{GBDT}}\bigl(\mathbf{x}(t)\bigr), \label{eq:hybrid}
+\end{equation}
+
+where $\hat{\boldsymbol{\beta}}^{\top}\mathbf{x}_{\mathrm{lin}}(t)$ captures global linear trends and $f_{\mathrm{GBDT}}$ fits the remaining nonlinear structure.
 
 \textbf{Step 2: Model combination.} Models trained on a single heat fail to transfer: across all off-diagonal pairs, the median R\ensuremath{^{2}} is \ensuremath{-}0.02 and 52\% of pairs are negative. We therefore combine training heats rather than selecting one. Three schemes address the combination requirement: pooling all training heats, hard grouping by converter or cluster, and soft-gated weighting by similarity to the test heat. For the soft-gated scheme, let $\mathbf{d}_j$ be a fingerprint of heat $j$ computed from its first 60 s: the mean normalized spectrum, mean Task-1 scores, mean flow and mean log total intensity. Training heat $j$ receives sample weight
 
@@ -447,7 +495,13 @@ b_k = \alpha\,e_k + (1-\alpha)\,b_{k-1}, \qquad \hat{y}_{\mathrm{c}}(t) = \hat{y
 
 where $k$ indexes the latest probe arrival up to time $t$, $e_k$ is its verified error, $\alpha$ is a smoothing factor and $g$ is the inner-loop gain. Under probe interval $N_{\mathrm{p}}$, the bias updates only when a new reading arrives.
 
-\textbf{Step 5: Prediction interval.} Split conformal prediction \cite{ref:9} scales inner-loop residuals by a local spread to construct a 90\% prediction interval.
+\textbf{Step 5: Prediction interval.} Split conformal prediction \cite{ref:9} scales inner-loop residuals by a local spread estimate $\hat{s}(t)$ to form a locally adaptive 90\% prediction interval:
+
+\begin{equation}
+\mathcal{C}_{0.90}(t) = \Bigl[\max\bigl(0,\,\hat{y}(t) - \hat{q}_{0.90}\,\hat{s}(t)\bigr),\;\; \hat{y}(t) + \hat{q}_{0.90}\,\hat{s}(t)\Bigr], \label{eq:conformal}
+\end{equation}
+
+where $\hat{q}_{0.90}$ is the empirical 90\% quantile of normalized inner-loop absolute residuals.
 
 \subsection{Model Solution and Results}\label{sec:7.3}
 
@@ -487,7 +541,7 @@ The conformal intervals perform as designed. Without probe readings, the 90\% in
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=1.0\linewidth]{figures/fig14_loho_predictions.pdf}
-\caption{\textbf{Leave-one-heat-out predictions of CO and CO\ensuremath{_{2}} for the ten heats.} Dashed lines are the zero-probe DSS predictions, bands their 90\% conformal intervals, and solid lines the delay-aligned readings. The model tracks every blowing stage; Heat 1 (shaded), whose CO in the first half of the main blow exceeds that of all other heats, is the hardest extrapolation case. Circles mark the last plotted sample of each series.}\label{fig:14}
+\caption{Leave-one-heat-out zero-probe DSS predictions with 90\% conformal intervals across all ten heats.}\label{fig:14}
 \end{figure}
 
 \subsubsection{Reducing Probe Usage}\label{sec:7.3.3}
