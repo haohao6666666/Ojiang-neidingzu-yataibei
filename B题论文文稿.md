@@ -42,7 +42,7 @@ The basic oxygen converter turns hot metal into steel by blowing high-purity oxy
 
 The two sources see the same reactions at different times. The flame responds to the bath immediately, while the gas must travel through the hood and the duct before the analyzer can measure it. This transport delay limits endpoint control, because a decision based on the analyzer refers to a bath state that is already half a minute old. The sampling probe also wears quickly in the dusty, high-temperature duct, so frequent sampling is costly. A data-driven soft sensor that reads the off-gas state from the flame [12, 13] would provide the signal earlier and would allow the probe to work less often.
 
-> **[Figure 1]** `paper_figures/out/fig01_dual_modal_schematic.pdf`，宽度 0.7。（**草稿，供胡乘风作底稿**：可直接使用，或据此用 TikZ/draw.io 重画；可编辑源文件 `paper_figures/fig01_schematic.py`）
+> **[Figure 1]** `paper_figures/out/fig01_dual_modal_schematic.pdf`，宽度 0.75。（AI 生成的无字底图 + 代码叠加英文标签；底图在 `paper_figures/base/`）
 > Caption: Dual-modal sensing layout of the basic oxygen converter.
 
 ### 1.2 Restatement of the Problem
@@ -58,7 +58,7 @@ The problem provides the full-process flame spectra (2,047 wavelengths, 0.5-s st
 
 Figure 2 outlines our workflow. We first diagnose the data and resolve four inconsistencies that would otherwise distort every downstream step. Section 4 then introduces an arrival-time map linking each real-time flame observation to the delayed gas reading it generates. The three tasks proceed as an integrated pipeline. First, Task 1 builds a low-rank model of the flame spectra to remove outliers and supply cleaned spectral representations. Second, Task 2 reconstructs the process curves, partitions each blow into chemical stages and quantifies how transport delay varies with lance flow. Finally, Task 3 feeds a spectral basis built on the low-rank structure of Task 1 and the delay map from Task 2 into a causal real-time predictor. It combines the heat-level models and updates predictions whenever a probe reading arrives.
 
-> **[Figure 2]** `paper_figures/out/fig02_framework.pdf`，宽度 1.0。（**草稿，供胡乘风作底稿**：可直接使用，或据此用 TikZ/draw.io 重画；可编辑源文件 `paper_figures/fig02_framework.py`）
+> **[Figure 2]** `paper_figures/out/fig02_framework.pdf`，宽度 1.0。（AI 生成的无字三层底图 + 代码叠加英文；只写方法，不写结果）
 > Caption: Integrated modeling framework across Tasks 1–3.
 
 ---
@@ -105,7 +105,7 @@ Figure 2 outlines our workflow. We first diagnose the data and resolve four inco
 
 Each attachment contains about 1,400 spectra of 2,047 wavelengths and the corresponding oxygen and gas records. Every model in this paper depends on the time axis, the lance flow and the meaning of the gas readings, so we examine these three items before modelling. Figure 3 shows the workflow, and Table 2 summarizes the ten heats after preprocessing.
 
-> **[Figure 3]** `paper_figures/out/fig03_preprocessing_workflow.pdf`，宽度 1.0。（**草稿，供胡乘风作底稿**：可直接使用，或据此用 TikZ/draw.io 重画；可编辑源文件 `paper_figures/fig03_preprocessing.py`）
+> **[Figure 3]** `paper_figures/out/fig03_preprocessing_workflow.pdf`，宽度 1.0。（**草稿，供胡乘风作底稿**；可编辑源文件 `paper_figures/fig03_preprocessing.py`）
 > Caption: Five-step data preprocessing and consistency workflow.
 
 > **Table 2. Overview of the ten heats after preprocessing**

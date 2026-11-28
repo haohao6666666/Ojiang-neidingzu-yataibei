@@ -17,8 +17,8 @@ python paper_figures/make_all.py          # 重出全部图（约 1 分钟）
 
 | 图 | 文件 | 宽度 | 数据来源 | 相比旧版的改动 |
 |---|---|---|---|---|
-| 1 | `fig01_dual_modal_schematic` | 0.7 | 示意图 | **草稿，供胡乘风作底稿**；新画：转炉、氧枪、火焰、光谱仪（real time）、烟道、ΔV_pipe、弯头处的分析仪（≈30 s later） |
-| 2 | `fig02_framework` | 1.0 | 示意图 | **草稿，供胡乘风作底稿**；新画：Data → Models → Results 三层色带；Task 1 的光谱基和 Task 2 的时延都输入 Task 3 |
+| 1 | `fig01_dual_modal_schematic` | 0.75 | GPT 底图 + 叠字 | **定稿**：写实 3D 剖面插画（`base/fig01_base_render.png`），标签由 `fig01_dual_modal_schematic.py` 叠加；旧草稿为 `draft_fig01_schematic.py`。原草稿内容：转炉、氧枪、火焰、光谱仪（real time）、烟道、ΔV_pipe、弯头处的分析仪（≈30 s later） |
+| 2 | `fig02_framework` | 1.0 | GPT 底图 + 叠字 | **定稿**：多色三层色带（`base/fig02_base_bands.png`），只写方法、不写结果；图标做成淡水印，英文由 `fig02_framework.py` 叠加；旧草稿为 `draft_fig02_framework.py`。原草稿内容：Data → Models → Results 三层色带；Task 1 的光谱基和 Task 2 的时延都输入 Task 3 |
 | 3 | `fig03_preprocessing_workflow` | 1.0 | 示意图 | **草稿，供胡乘风作底稿**；新画：5 个步骤，每步只写一个关键结论 |
 | 4 | `fig04_o2_counter_beat` | 1.0 | A 版 Heat 3 原始计数 | 统一配色；(b) 的窗口说明改成图例 |
 | 5 | `fig05_carbon_oxygen_balance` | 0.7 | A 版 `q2_mass_balance.csv` | 去掉标题；均值线和物理上限放进图例 |
@@ -46,7 +46,11 @@ python paper_figures/make_all.py          # 重出全部图（约 1 分钟）
 - `extract_data.py`：从 `B_results/data_clean` 缓存、两版冻结表格，以及 v4 代码重跑的导出数据，生成 `data/` 下的紧凑数据。
 - v4 重跑结果与冻结表**完全一致**：18 行汇总的最大差值为 0，逐炉 CO R² 与正文相同。
 
-## Fig 1–3 草稿说明（给胡乘风）
+## Fig 1–2 的底图说明
+
+Fig 1 和 Fig 2 的底图由 AI 图像工具生成，不含任何文字；所有英文、公式和箭头标签都由脚本叠加，便于修改。如果比赛要求声明 AI 使用情况，请在致谢或附录里注明：*The base artwork of Figures 1 and 2 was generated with an AI image tool; all labels were added by the authors.*
+
+## Fig 3 草稿说明（给胡乘风）
 
 这三张示意图是底稿，可以直接放进论文，也可以照着用 TikZ 或 draw.io 重画。改文字或配色时，直接编辑对应脚本（`fig01_schematic.py`、`fig02_framework.py`、`fig03_preprocessing.py`）后运行即可；圆角框和箭头的画法在 `diagram.py` 里，颜色在 `style.py` 里。重画时请保持：
 

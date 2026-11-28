@@ -1,56 +1,85 @@
-"""Figure 2 - framework of our work (Euler-Award three-band layout, short phrases only). Width 1.0."""
-from diagram import arrow, box, canvas, text
-from style import INDIGO, LABEL, NAVY, TEXTW, save
+"""Figure 2 - framework of our work (methods only, no results).
 
-W, H = TEXTW, 2.75
-fig, ax = canvas(W, H)
-bands = [  # (label, y0, height, background)
-    ("Data", 2.02, 0.66, "#ECEBF5"),
-    ("Models", 0.98, 0.92, "#F6ECE4"),
-    ("Results", 0.08, 0.78, "#E8EAF3"),
-]
-lx = 0.36
-for name, y0, h, bg in bands:
-    box(ax, 0.02, y0, W - 0.04, h, fc=bg, ec="none", r=0.08, z=0)
-    text(ax, 0.19, y0 + h / 2, name, size=8.5, color=LABEL, weight="bold", rotation=90)
+Base image: base/fig02_base_bands.png (AI-generated text-free three-band layout, 1672 x 941 px).
+Card icons are faded into watermarks so text can sit over them (Euler-Award style). Width 1.0.
+"""
+import os
 
-cols = [lx + 0.05, lx + 1.85, lx + 3.65]
-cw = 1.50
+import matplotlib.pyplot as plt
+from matplotlib.patches import FancyBboxPatch, Rectangle
+from PIL import Image
 
-# Data band: input -> checks -> arrival-time map
-yD, hD = 2.12, 0.46
-box(ax, cols[0], yD, cw, hD, fc="white", ec="none")
-text(ax, cols[0] + cw / 2, yD + hD / 2, "10 heats\nspectra + O$_2$ + CO/CO$_2$", size=7.3, linespacing=1.3)
-box(ax, cols[1], yD, cw, hD, fc="white", ec="none")
-text(ax, cols[1] + cw / 2, yD + hD / 2, "4 consistency checks\n(Section 3)", size=7.3, linespacing=1.3)
-box(ax, cols[2], yD, cw, hD, fc="#FBE3CC", ec="none")
-text(ax, cols[2] + cw / 2, yD + hD / 2, "Arrival-time map\n$V(t_{arr}) - V(t) = \\Delta V_{pipe}$", size=7.3, linespacing=1.4)
-for i in range(2):
-    arrow(ax, (cols[i] + cw + 0.03, yD + hD / 2), (cols[i + 1] - 0.03, yD + hD / 2), color=NAVY, lw=1.0, ms_=7)
+from style import HERE, TEXTW, save
 
-# Models band: three tasks
-yM, hM = 1.10, 0.64
-tasks = [("Task 1", "RLR", "$X = L + S$"), ("Task 2", "4 stages + PFD", r"$\tau(Q)$"), ("Task 3", "DSS + Smith", "real-time CO, CO$_2$")]
-for c, (tag, name, sub) in zip(cols, tasks):
-    box(ax, c, yM, cw, hM, fc="white", ec="none")
-    box(ax, c, yM + hM - 0.2, cw, 0.2, fc=INDIGO, ec="none")
-    ax.add_patch(__import__("matplotlib.patches", fromlist=["Rectangle"]).Rectangle((c, yM + hM - 0.2), cw, 0.1, fc=INDIGO, ec="none", zorder=2))
-    text(ax, c + cw / 2, yM + hM - 0.1, tag, size=7.5, color="white", weight="bold")
-    text(ax, c + cw / 2, yM + 0.27, name, size=8, color="#222222", weight="bold")
-    text(ax, c + cw / 2, yM + 0.10, sub, size=7.2, color="#444444")
-# data feeds every task; Task 1 and Task 2 feed Task 3
-for c in cols:
-    arrow(ax, (c + cw / 2, yD - 0.03), (c + cw / 2, yM + hM + 0.03), color=NAVY, lw=0.9, ms_=6)
-arrow(ax, (cols[1] + cw + 0.03, yM + 0.32), (cols[2] - 0.03, yM + 0.32), color="#D07A5E", lw=1.3, ms_=8)
-text(ax, (cols[1] + cw + cols[2]) / 2, yM + 0.17, "delay", size=6.8, color="#B4605A")
-arrow(ax, (cols[0] + cw * 0.70, yM - 0.03), (cols[2] + cw * 0.30, yM - 0.03), color="#D07A5E", lw=1.3, ms_=8, rad=0.18)
-text(ax, cols[1] + cw / 2, yM - 0.23, "spectral basis", size=6.6, color="#B4605A")
+img = Image.open(os.path.join(HERE, "base", "fig02_base_bands.png")).convert("RGB")
+# move the duct-and-clock icon of the Foundation panel to the left so the formula fits on one line
+_icon = img.crop((1178, 85, 1376, 236))
+img.paste((254, 254, 254), (1178, 85, 1376, 236))
+img.paste(_icon, (975, 100))
+W_PX, H_PX = img.size
+fig = plt.figure(figsize=(TEXTW, TEXTW * H_PX / W_PX))
+ax = fig.add_axes([0, 0, 1, 1])
+ax.imshow(img, extent=[0, W_PX, H_PX, 0], interpolation="none")
+ax.set_xlim(0, W_PX)
+ax.set_ylim(H_PX, 0)
+ax.axis("off")
 
-# Results band: one key number per task
-yR, hR = 0.18, 0.46
-res = ["Spike F1 0.89\nhold-out error 2.0%", r"$\tau$ = 5 + 127.1/$Q$ s" "\nstages at 23/43/90% O$_2$",
-       "CO $R^2$ 0.873 → 0.908\n99.6% fewer probe readings"]
-for c, r in zip(cols, res):
-    box(ax, c, yR, cw, hR, fc="white", ec="none")
-    text(ax, c + cw / 2, yR + hR / 2, r, size=7.2, color=LABEL, linespacing=1.35)
-save(fig, "fig02_framework")
+INK = "#1F2A44"
+TEAL, AMBER, BLUE, CORAL, VIOLET = "#167A6E", "#C8742E", "#2F6A92", "#C2513A", "#5A4FB0"
+
+
+def veil(x0, y0, x1, y1, color, alpha=0.62):
+    """Fade the watermark icons inside a card body."""
+    ax.add_patch(Rectangle((x0, y0), x1 - x0, y1 - y0, fc=color, ec="none", alpha=alpha, zorder=2))
+
+
+def t(x, y, s, size=8.0, color=INK, weight=None, ha="left", va="center", rot=0, style=None, family="Arial Narrow"):
+    ax.text(x, y, s, fontsize=size, color=color, weight=weight, ha=ha, va=va, rotation=rot, style=style,
+            family=family, zorder=5)
+
+
+def bullets(x, y0, items, dy, size=7.6, color=INK, family="Arial Narrow"):
+    for i, s in enumerate(items):
+        t(x, y0 + i * dy, "•  " + s, size=size, color=color, family=family)
+
+
+# band titles (vertical, in the left margin of each band)
+t(30, 152, "Data & Foundation", size=7.2, color=TEAL, weight="bold", ha="center", rot=90)
+t(30, 503, "Models", size=7.6, color="#4A4A4A", weight="bold", ha="center", rot=90)
+t(30, 823, "Validation", size=7.4, color=VIOLET, weight="bold", ha="center", rot=90)
+
+# top-left: problems to address (one line per icon)
+probs = [(68, "Irregular time axis"), (127, "Saturated, flickering spectra"), (180, "Stepwise oxygen counter"),
+         (236, "Ambiguous gas units")]
+for y, s in probs:
+    t(170, y, s, size=8.6)
+
+# top-right: foundation
+t(965, 64, "Foundation", size=8.4, color=TEAL, weight="bold")
+t(1128, 64, "Oxygen-clock arrival map", size=8.6, weight="bold")
+t(1205, 172, r"$V(t_{\mathrm{arr}}) - V(t) = \Delta V_{\mathrm{pipe}}$", size=9.2)
+
+# middle: three task cards (header y 360-410, body 410-610)
+cards = [(50, 547, "#FDF1E6", "Task 1  ·  Spectral Cleaning",
+          ["Robust low-rank (RLR) model", "Pixel & frame outlier rules", "Continuous 3-D spectral surface"]),
+         (597, 1053, "#E2EEF8", "Task 2  ·  Oxygen, Gas & Delay",
+          ["Six continuous process curves", "Four-stage oxygen–gas relation", "Plug-flow delay  τ(Q)"]),
+         (1135, 1622, "#FBE7E2", "Task 3  ·  Real-Time Soft Sensor",
+          ["Causal spectral features", "Soft-gated heat combination", "Smith correction & conformal band"])]
+for x0, x1, body, head, items in cards:
+    veil(x0 + 4, 412, x1 - 4, 606, body)
+    t((x0 + x1) / 2, 385, head, size=8.6, color="white", weight="bold", ha="center")
+    bullets(x0 + 26, 452, items, 46, size=8.0)
+
+# dependency labels
+t(1093, 462, "delay", size=7.2, color=INK, ha="center", style="italic")
+t(820, 645, "spectral basis", size=7.6, color=INK, ha="center", style="italic")
+
+# bottom: validation and sensitivity
+t(225, 772, "Model Validation", size=8.4, color=VIOLET, weight="bold")
+bullets(225, 812, ["Outlier injection test", "Leave-one-heat-out evaluation", "Leakage audit (future frames, test heat)"], 34, size=7.6)
+t(880, 772, "Sensitivity Analysis", size=8.4, color=VIOLET, weight="bold")
+bullets(880, 812, ["Outlier threshold & rank", "Duct volume ±10%", "Probe sampling interval"], 34, size=7.6)
+
+paths = save(fig, "fig02_framework")
+fig.savefig(paths[1], dpi=400, bbox_inches="tight", pad_inches=0.01)
