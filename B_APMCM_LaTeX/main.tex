@@ -1,0 +1,84 @@
+%!TEX program = xelatex
+\PassOptionsToPackage{unicode,pdfpagelabels=false}{hyperref}
+\documentclass[12pt]{apmcmthesis}
+\usepackage[palette=euler,apmcmheadings=true,linespread=1.00]{o-style}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage{placeins,fvextra,etoolbox}
+\hypersetup{pdfauthor={},pdfcreator={},pdfsubject={},pdfkeywords={},hypertexnames=false}
+\geometry{left=1in,right=1in,top=1in,bottom=1in,headheight=14.5pt,headsep=20pt}
+\setcounter{tocdepth}{3}
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+\titlecontents{section}[1.65em]{\addvspace{2pt}\bfseries}
+  {\contentslabel[\thecontentslabel.]{1.65em}}{\hspace*{-1.65em}}
+  {\titlerule*[0.5pc]{.}\contentspage}
+\titlecontents{subsection}[3.65em]{\normalfont}
+  {\contentslabel{2.2em}}{}{\titlerule*[0.5pc]{.}\contentspage}
+\titlecontents{subsubsection}[6.6em]{\normalfont}
+  {\contentslabel{2.95em}}{}{\titlerule*[0.5pc]{.}\contentspage}
+\DeclareCaptionFont{eulerplain}{\let\textbf\textnormal}
+\AtBeginDocument{%
+  \setlength{\parindent}{1.5em}%
+  \normalem
+  \captionsetup[figure]{font={normalsize,eulerplain},labelfont=normalfont,skip=8pt}%
+  \captionsetup[table]{font={normalsize,eulerplain},labelfont=normalfont,position=top,skip=3pt}}
+\patchcmd{\thebibliography}{\section{\refname}}
+  {\section*{\refname}\phantomsection\addcontentsline{toc}{section}{\refname}}{}{}
+\fancypagestyle{frontmatterstyle}{%
+  \fancyhf{}%
+  \fancyheadoffset[L,R]{0pt}%
+  \fancyhead[L]{\small\team}%
+  \renewcommand{\headrulewidth}{0.4pt}}
+\fancypagestyle{mainmatterstyle}{%
+  \fancyhf{}%
+  \fancyheadoffset[L,R]{0pt}%
+  \fancyhead[L]{\sffamily\fontsize{10}{12}\selectfont\team}%
+  \fancyhead[R]{\sffamily\fontsize{10}{12}\selectfont Page \thepage\ of \pageref{LastPage}}%
+  \renewcommand{\headrulewidth}{0.4pt}}
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\newcolumntype{Z}{>{\centering\arraybackslash}X}
+\newcolumntype{K}[1]{>{\centering\arraybackslash}m{#1}}
+\newcommand{\PaperTitle}[2]{%
+  \par\begingroup\centering
+  {\normalfont\bfseries\large #1\ #2\par}
+  \endgroup\vspace{4pt}}
+\setlength{\textfloatsep}{11pt plus 3pt minus 3pt}
+\setlength{\intextsep}{9pt plus 3pt minus 2pt}
+\setlength{\floatsep}{9pt plus 3pt minus 2pt}
+\setlength{\tabcolsep}{3.5pt}
+\setlength{\emergencystretch}{2em}
+\graphicspath{{figures/}}
+\newif\ifpaperappendix
+\paperappendixfalse
+\tihao{B}
+\input{team-number}
+\begin{document}
+\newgeometry{top=26.4mm,bottom=26.4mm,left=31.8mm,right=31.8mm,headheight=14.5pt,headsep=18pt}
+\pagestyle{frontmatterstyle}
+\begin{abstract}
+\begingroup
+\linespread{1.00}\selectfont
+\setlength{\parskip}{2pt}
+\input{sections/summary}
+\endgroup
+\end{abstract}
+\clearpage
+\begingroup
+\small
+\titleformat{name=\section,numberless}{\centering\normalfont\Large\bfseries}{}{0pt}{}
+\tableofcontents
+\endgroup
+\restoregeometry
+\pagestyle{mainmatterstyle}
+\setcounter{page}{1}
+\input{sections/body}
+\input{sections/references}
+\ifpaperappendix
+  \clearpage
+  \appendix
+  \titleformat{\section}{\normalfont\Large\bfseries}{\appendixname~\thesection}{0.8em}{}
+  \input{sections/appendix}
+\fi
+\end{document}
+

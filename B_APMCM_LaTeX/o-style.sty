@@ -1,0 +1,195 @@
+%% o-style.sty -- "O-award" overlay for mcmthesis (MCM/ICM) and apmcmthesis (APMCM).
+%% Load it right after \documentclass. Compile with XeLaTeX (twice) or latexmk -xelatex.
+%%
+%%   \usepackage[palette=steel]{o-style}            % euler | teal | steel | slate
+%%   \usepackage[palette=steel, apmcmheadings=false, linespread=1.15]{o-style}
+%%
+%% What it does (each item is motivated in SKILL.md):
+%%   * Times text + Times-compatible math (newtx) -- what 9/10 O-award papers look like;
+%%   * palette colours shared with the Python figure style (mcm_style.py);
+%%   * captions: bold label, small text; table captions above, figure captions below;
+%%   * booktabs tables with optional pale header row (\tabhead) and highlight row (\hlrow);
+%%   * environments: assumptions (Assumption + Justification), notation table, keyfinding box,
+%%     memo (one-page letter), aireport; compact lists; siunitx; algorithms; cleveref;
+%%   * APMCM only: left-aligned Arabic section numbers (like O-award papers) and tighter line
+%%     spacing (the official class uses 1.38, which wastes ~3 pages of the 25-page limit).
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{o-style}[2026/11/27 v1.0 O-award overlay for mcmthesis/apmcmthesis]
+
+\RequirePackage{kvoptions}
+\SetupKeyvalOptions{family=ostyle,prefix=ostyle@}
+\DeclareStringOption[steel]{palette}
+\DeclareBoolOption[true]{apmcmheadings}
+\DeclareStringOption[1.15]{linespread}
+\DeclareBoolOption[true]{times}
+\ProcessKeyvalOptions*
+
+\@ifclassloaded{apmcmthesis}{\def\ostyle@cls{apmcm}}{%
+  \@ifclassloaded{mcmthesis}{\def\ostyle@cls{mcm}}{\def\ostyle@cls{other}}}
+
+%% ---------------------------------------------------------------- fonts
+\RequirePackage{iftex}
+\ifostyle@times
+  \ifXeTeX
+    % Times-compatible math first (newtxmath; must precede fontspec), then Times text via fontspec.
+    % apmcmthesis already loads ctex + Times New Roman; mcmthesis loads nothing.
+    \RequirePackage[varbb]{newtxmath}
+    \RequirePackage{fontspec}
+    \IfFontExistsTF{TeX Gyre Termes}{\setmainfont{TeX Gyre Termes}}{\setmainfont{Times New Roman}}
+  \else
+    \RequirePackage{newtxtext}
+    \RequirePackage{newtxmath}
+  \fi
+\fi
+
+%% ---------------------------------------------------------------- palette
+\RequirePackage{xcolor}
+\newcommand{\ostyle@defpal}[8]{%
+  \definecolor{mcmPrimary}{HTML}{#1}\definecolor{mcmAccent}{HTML}{#2}%
+  \definecolor{mcmSecondary}{HTML}{#3}\definecolor{mcmLight}{HTML}{#4}%
+  \definecolor{mcmLightAccent}{HTML}{#5}\definecolor{mcmDark}{HTML}{#6}%
+  \definecolor{mcmBaseline}{HTML}{#7}\definecolor{mcmAccentDark}{HTML}{#8}}
+\newcommand{\mcmpalette}[1]{%
+  \edef\ostyle@tmp{#1}%
+  \def\ostyle@euler{euler}\def\ostyle@teal{teal}\def\ostyle@steel{steel}\def\ostyle@slate{slate}%
+  \ifx\ostyle@tmp\ostyle@euler \ostyle@defpal{4C5D91}{E8956A}{A99BCF}{E4E1F1}{FBE3D0}{2F3A5C}{9A9A9A}{C46A4A}\fi
+  \ifx\ostyle@tmp\ostyle@teal  \ostyle@defpal{2F7F91}{E2876A}{7DB3C0}{DCEEF1}{F8DDD2}{244A55}{9AA3A8}{B85C62}\fi
+  \ifx\ostyle@tmp\ostyle@steel \ostyle@defpal{206FAA}{D9A441}{6C92AB}{DDEAF4}{F6EACB}{24435C}{9C9C9C}{B5524A}\fi
+  \ifx\ostyle@tmp\ostyle@slate \ostyle@defpal{3E5C76}{E07B39}{748CA3}{E3EAF0}{FBE2D0}{263645}{A0A0A0}{C8553D}\fi}
+\mcmpalette{\ostyle@palette}
+
+%% ---------------------------------------------------------------- page / spacing
+\ifx\ostyle@cls\@empty\else\fi
+\def\ostyle@apmcm{apmcm}
+\ifx\ostyle@cls\ostyle@apmcm
+  \renewcommand*{\baselinestretch}{\ostyle@linespread}
+  \AtBeginDocument{\selectfont}
+  \ifostyle@apmcmheadings
+    % O-award look: "3  Data Preprocessing", "3.1  Outlier Removal", left aligned.
+    \renewcommand\thesubsection{\thesection.\arabic{subsection}}
+    \renewcommand\thesubsubsection{\thesubsection.\arabic{subsubsection}}
+    \titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{0.8em}{}
+    \titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{0.8em}{}
+    \titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection}{0.8em}{}
+    \titlespacing*{\section}{0pt}{2.2ex plus .8ex minus .2ex}{1.2ex plus .2ex}
+    \titlespacing*{\subsection}{0pt}{1.8ex plus .6ex minus .2ex}{0.8ex plus .2ex}
+    \titlespacing*{\subsubsection}{0pt}{1.4ex plus .4ex minus .2ex}{0.6ex plus .2ex}
+    \titlecontents{section}[0pt]{\addvspace{2pt}\bfseries}{\thecontentslabel\enspace}{}{\titlerule*[0.5pc]{.}\contentspage}
+  \fi
+  \setlength\parindent{1.5em}
+\fi
+\def\ostyle@mcm{mcm}
+\ifx\ostyle@cls\ostyle@mcm
+  % mcmthesis puts 0pt above \section; give headings a little air (O-award papers do).
+  \renewcommand\section{\@startsection{section}{1}{\z@}{-1.6ex\@plus -.4ex \@minus -.2ex}{0.8ex \@plus .2ex}{\rmfamily\Large\bfseries}}
+  \renewcommand\subsection{\@startsection{subsection}{2}{\z@}{-1.2ex\@plus -.3ex \@minus -.2ex}{0.5ex \@plus .2ex}{\rmfamily\large\bfseries}}
+  % one-page table of contents: tighter section entries
+  \renewcommand*\l@section[2]{\addpenalty{\@secpenalty}\addvspace{0.45em}%
+    {\bfseries\@dottedtocline{1}{0em}{1.6em}{#1}{#2}}}
+\fi
+\setcounter{tocdepth}{2}
+
+%% fancyhdr asks for a taller head with Times 12pt
+\setlength{\headheight}{14.5pt}
+
+%% ---------------------------------------------------------------- floats & captions
+\RequirePackage{graphicx}
+\graphicspath{{figures/}{./}}
+\RequirePackage{float}
+\RequirePackage{caption}
+\RequirePackage{subcaption}
+\newcommand{\ostyle@captions}{%
+  \captionsetup{font=small,labelfont=bf,textfont=normalfont,labelsep=colon,skip=5pt,justification=justified,singlelinecheck=true}%
+  \captionsetup[figure]{format=plain,labelsep=colon,font=small,labelfont=bf,textfont=normalfont,skip=5pt}%
+  \captionsetup[table]{format=plain,labelsep=colon,font=small,labelfont=bf,textfont=normalfont,position=top,skip=3pt}%
+  \captionsetup[sub]{font=small,labelfont=bf,textfont=normalfont,skip=2pt}}
+\ostyle@captions
+\AtBeginDocument{\ostyle@captions}   % apmcmthesis loads its .cfg at \begin{document}; re-apply after it
+\setcounter{topnumber}{3}\setcounter{bottomnumber}{2}\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.85}\renewcommand{\bottomfraction}{0.6}
+\renewcommand{\textfraction}{0.12}\renewcommand{\floatpagefraction}{0.75}
+
+%% ---------------------------------------------------------------- tables
+\RequirePackage{booktabs,array,tabularx,multirow}
+\RequirePackage{colortbl}
+\setlength{\heavyrulewidth}{1.0pt}\setlength{\lightrulewidth}{0.5pt}\setlength{\cmidrulewidth}{0.4pt}
+\newcommand{\tabhead}{\rowcolor{mcmLight}}            % pale header row in palette colour
+\newcommand{\hlrow}{\rowcolor{mcmLightAccent}}         % highlight the key row (our model / chosen plan)
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+% Notation table: \begin{notation} $x_t$ & meaning & unit \\ \notationgroup{State variables} ... \end{notation}
+\newenvironment{notation}[1][Notations used in this paper]
+  {\begin{table}[htbp]\centering\small\caption{#1}\label{tab:notation}%
+   \begin{tabular}{@{}l L{0.62\textwidth} l@{}}\toprule
+   \textbf{Symbol} & \textbf{Description} & \textbf{Unit}\\\midrule}
+  {\bottomrule\end{tabular}\end{table}}
+\newcommand{\notationgroup}[1]{\multicolumn{3}{@{}l}{\textit{#1}}\\[1pt]}
+
+%% ---------------------------------------------------------------- math & units
+\RequirePackage{amsmath,amssymb,bm}
+\RequirePackage{siunitx}
+\sisetup{detect-all,range-phrase={--},per-mode=symbol,group-minimum-digits=4}
+\providecommand{\dif}{\mathop{}\!\mathrm{d}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+
+%% ---------------------------------------------------------------- lists
+\RequirePackage{enumitem}
+\setlist{itemsep=1pt,topsep=3pt,parsep=0pt,partopsep=0pt}
+\setlist[itemize]{leftmargin=1.5em,label=\textbullet}
+\setlist[enumerate]{leftmargin=1.8em}
+
+% Assumptions with justifications (9/10 O-award papers use this exact pattern)
+% \begin{assumptions} \assume{statement}{justification} ... \end{assumptions}
+\newcounter{ostyleassump}
+\newenvironment{assumptions}{\setcounter{ostyleassump}{0}\begin{itemize}[leftmargin=1.2em,itemsep=3pt]}{\end{itemize}}
+\newcommand{\assume}[2]{\refstepcounter{ostyleassump}%
+  \item \textbf{Assumption \theostyleassump:} #1\par
+        \noindent\hspace*{0pt}\textit{Justification:} #2}
+
+%% ---------------------------------------------------------------- boxes
+\RequirePackage[most]{tcolorbox}
+% One per task at most: the single sentence a judge should remember.
+\newtcolorbox{keyfinding}[1][Key finding]{enhanced,breakable,colback=mcmLight,colframe=mcmPrimary,
+  boxrule=0pt,leftrule=2.5pt,arc=0pt,outer arc=0pt,left=6pt,right=6pt,top=3pt,bottom=3pt,
+  fonttitle=\bfseries\small,coltitle=mcmDark,title={#1},attach title to upper={\ \ },
+  fontupper=\small,before skip=6pt,after skip=6pt}
+
+%% ---------------------------------------------------------------- memo / letter
+% \begin{memo*}{To}{From}{Date}{Subject} ... \end{memo*}   (one page, no equations)
+\newenvironment{memo*}[4]
+  {\clearpage\section*{Memorandum}\addcontentsline{toc}{section}{Memorandum}%
+   \noindent{\color{mcmPrimary}\rule{\linewidth}{1.2pt}}\par\vspace{2pt}
+   \noindent\begin{tabular}{@{}>{\bfseries}l@{\ \ }l@{}}
+     To: & #1\\ From: & #2\\ Date: & #3\\ Subject: & #4
+   \end{tabular}\par\vspace{2pt}\noindent{\color{mcmPrimary}\rule{\linewidth}{0.4pt}}\par\vspace{4pt}\small}
+  {\par}
+
+%% ---------------------------------------------------------------- algorithms & code
+\RequirePackage{algorithm}
+\RequirePackage{algpseudocode}
+\RequirePackage{listings}
+\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,frame=tb,framerule=0.6pt,
+  rulecolor=\color{mcmBaseline},backgroundcolor=\color{mcmLight!35},keywordstyle=\color{mcmPrimary}\bfseries,
+  commentstyle=\color{mcmBaseline}\itshape,stringstyle=\color{mcmAccentDark},showstringspaces=false,
+  columns=flexible,tabsize=4,numbers=left,numberstyle=\tiny\color{mcmBaseline},xleftmargin=1.5em}
+
+%% ---------------------------------------------------------------- placeholders
+% \TBD{...} prints red text; scripts/check_paper.py refuses to pass while any remain.
+\newcommand{\TBD}[1]{\textcolor{red}{[TBD: #1]}}
+
+%% ---------------------------------------------------------------- refs & links
+\RequirePackage{hyperref}
+\hypersetup{hidelinks,pdfauthor={},pdfcreator={},pdfproducer={},pdfsubject={},pdfkeywords={}}
+\RequirePackage[capitalise,nameinlink,noabbrev]{cleveref}
+\crefname{equation}{Eq.}{Eqs.}\Crefname{equation}{Eq.}{Eqs.}
+\crefformat{equation}{Eq.~(#2#1#3)}
+\crefname{assumption}{Assumption}{Assumptions}
+
+% AI-use report (MCM/ICM requires it; it does not count toward the 25 pages)
+\newenvironment{aireport}{\clearpage\section*{Report on Use of AI}\addcontentsline{toc}{section}{Report on Use of AI}\small}{\par}
+
+\endinput
+

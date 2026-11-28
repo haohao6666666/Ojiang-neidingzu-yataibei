@@ -1,0 +1,17 @@
+\PaperTitle{Seeing the Off-Gas Before It Arrives:}{Delay-Aware Fusion of Flame Spectra and Flue-Gas Signals for Converter Steelmaking}
+
+In converter steelmaking, the mouth flame reflects bath reactions in real time, whereas the flue-gas analyzer reports them only after the gas crosses the duct, about half a minute later. We develop a \textbf{Delay-Aware Dual-Modal Framework} that cleans both streams, quantifies the transport delay and infers the off-gas state from the flame before the analyzer measures it.
+
+Before modelling, we diagnose four data anomalies. We adopt the corrected Attachment 1 and establish a sampling interval of 1 s for Heat 5. Because the cumulative-oxygen counter advances in steps of about 4.73 m\ensuremath{^{3}} with a double step every 11 s, we estimate the lance flow from a 24-s regression slope rather than direct differencing. A carbon–oxygen balance shows that, read as flow rates, the CO and CO\ensuremath{_{2}} values would require \textbf{5.5–6.5 times} the supplied oxygen; we therefore interpret them as volume fractions.
+
+\textbf{Task 1: Spectral cleaning and continuity.} We build a \textbf{Rank-Constrained Robust Low-Rank model (RLR)} that separates each log spectrum into three components and sparse outliers. The first component tracks flame brightness and the second tracks spectral colour. In an injection test, RLR detects spikes with an F1 score of \textbf{0.89} (Hampel filter: 0.22), and the continuous surface reconstructs held-out pixels with a relative error of \textbf{2.0\%}. Sparse outliers concentrate on the potassium and sodium lines, which fluctuate independently of the thermal continuum.
+
+\textbf{Task 2: Oxygen, gas and delay.} We reconstruct six continuous process curves per heat and identify four blowing stages, with breakpoints at \textbf{23\%, 43\% and 90\%} of the total oxygen (piecewise R\ensuremath{^{2}} = 0.956–0.997). In the cumulative-oxygen coordinate, the gas trajectories of all ten heats collapse onto one curve, which the \textbf{Plug-Flow Delay model (PFD)} fits with R\ensuremath{^{2}} = 0.976. The model gives \textbf{\ensuremath{\tau}(Q) = 5 + 127.1/Q s}, so the delay drops from 47.4 s at 3 m\ensuremath{^{3}}/s to \textbf{30.4 s} at 5 m\ensuremath{^{3}}/s. Windowed cross-correlation independently confirms that the delay decreases with the flow (Spearman \ensuremath{\rho} = \ensuremath{-}0.75, p = 3.4\ensuremath{\times}10\ensuremath{^{-9}}).
+
+\textbf{Task 3: Real-time prediction.} We build a \textbf{Dual-Modal Soft Sensor (DSS)} that projects each frame onto a low-rank spectral basis learned across the training heats. It aligns the prediction target with the PFD arrival map and combines heat-level models through similarity weighting. Under leave-one-heat-out validation across all ten heats, the zero-probe DSS predicts CO and CO\ensuremath{_{2}} with mean R\ensuremath{^{2}} of \textbf{0.873} and \textbf{0.658}. A Smith-type correction with one probe reading every 120 s (\textbf{99.6\% fewer readings}) raises R\ensuremath{^{2}} to \textbf{0.908} and \textbf{0.695}, about 30 s ahead of the analyzer.
+
+Sensitivity analysis shows that a \ensuremath{\pm}10\% error in the duct volume shifts the zero-probe R\ensuremath{^{2}} by at most 0.003, and that the stage and delay results hold across both converter groups. Flame spectra can thus replace most probe readings while delivering off-gas information earlier.
+
+\keywords{robust low-rank decomposition; plug-flow delay; soft sensor; leave-one-heat-out validation; Smith predictor; converter steelmaking}
+
+
