@@ -4,7 +4,7 @@
 
 - `main.tex` 是入口，`team-number.tex` 保存正式队号。
 - `sections/` 下分别是摘要、正文、参考文献和附录，可直接编辑。
-- 第1页和第2页使用2026 APMCM模板的摘要页与目录页结构。第3张起为正文，按官方模板从第1页编号。目录显示到三级，带点线、页码和附录条目。
+- 第1页和第2页使用2026 APMCM模板的摘要页与目录页结构。第3张起为正文，按官方模板从第1页编号。目录显示到三级，带点线和页码。
 - 校样默认在参考文献结束。正式提交如需恢复逐炉图表和软件与源码附录，在 `main.tex` 将 `\paperappendixfalse` 改为 `\paperappendixtrue`。
 - 正文插图基于团队仓库的 `c16d95b62d6ac9ba04d478d3c4bddbbc1b6de39f` 提交。图3图注写明五步预处理。图14标记样本终点，图15(b)用下箭头注明超出显示范围的R²。
 - `figure-source/` 保留图1、6、7、14、15的重绘脚本和所用的冻结输入。在工程目录用 Python 运行对应脚本会更新 `figures/` 中的PDF。需要 NumPy、pandas 和 Matplotlib。
@@ -13,13 +13,13 @@
 
 在本目录运行两次 `xelatex main.tex`，或运行 `latexmk -xelatex main.tex`。在 Overleaf 中将编译器设为 XeLaTeX。正文、图、表和引用均已排入本项目，编译不需要外部仓库或竞赛数据。
 
-报名号尚未提供。使用正式队号替换 `team-number.tex` 中的占位文本。
+正式报名号保存在 `team-number.tex` 中。
 
-打开 [PDF 校样](APMCM-B-preview.pdf) 查看最新版。校样共25页，图15在PDF第22页，三个子图自上而下排列，分别附有图内说明。
+打开 [PDF 校样](APMCM-B-preview.pdf) 查看最新版。校样共25页，图15在PDF第22页，三个无外框的子图自上而下排列，分别附有图内说明。
 
 ## 2026-11-28 更新：图1、图2
 
 - `figures/fig01_dual_modal_schematic.pdf` 和 `figures/fig02_framework.pdf` 已换成新版：AI 生成无字底图，再用代码叠加英文。源文件和底图在仓库的 `paper_figures/`（`fig01_dual_modal_schematic.py`、`fig02_framework.py`、`base/`）。
 - 图1宽度改为 0.75（`sections/body.tex` 与 `prepare_paper.py` 已同步）。旧的手绘脚本改名为 `figure-source/draft_fig01_schematic.py`，避免运行后覆盖新图。
 - 重新编译后正文仍为 23 页（Page x of 23），没有因为新图增加页数。
-- **待处理**：当前 `sections/summary.tex` 编译后摘要页溢出约两行，关键词落到了第 2 页，导致总页数变成 26。仓库里的 `APMCM-B-preview.pdf` 是摘要润色之前编译的，所以没有显示这个问题。需要把摘要删短约两行。
+- 摘要和关键词同在第1页，目录在第2页。摘要用11磅，正文用12磅，正文含参考文献共23页。长公式逐行居中，数学除法以分式显示。

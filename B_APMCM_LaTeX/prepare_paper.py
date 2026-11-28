@@ -106,8 +106,7 @@ def figure(number, caption):
         caption += LOHO_ENDPOINT_CAPTION
     if number == 15:
         caption = "Cross-heat transfer, probe-saving trade-off and wavelength importance."
-        placement = "!p"
-        size = r"\linewidth,height=.92\textheight,keepaspectratio"
+        size = r"\linewidth,height=.88\textheight,keepaspectratio"
     graphic = r"\includegraphics[width=" + size + "]{figures/" + stem + ".pdf}"
     return "\n".join([r"\begin{figure}[" + placement + "]", r"\centering", graphic,
                       r"\caption{" + markup(caption) + r"}\label{fig:" + str(number) + "}", r"\end{figure}"])

@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 from matplotlib.colors import TwoSlopeNorm
 from matplotlib.lines import Line2D
-from matplotlib.patches import Rectangle
 
 from style import CO, CO2, DATA, DIV, GOLD, GREY, LABEL, ms, save
 
@@ -18,9 +17,6 @@ fig = plt.figure(figsize=ms.figsize(1.0, 1.37))
 
 
 def panel(bottom, top, title, note):
-    fig.add_artist(Rectangle((0.025, bottom), 0.95, top - bottom,
-                             transform=fig.transFigure, fill=False,
-                             edgecolor="#CFD1DF", linewidth=0.6))
     fig.text(0.5, top - 0.020, title, ha="center", va="center",
              fontsize=10, weight="bold", color=LABEL)
     fig.text(0.5, bottom + 0.012, note, ha="center", va="bottom",

@@ -63,11 +63,11 @@ Table~\ref{tab:1} lists the symbols and their units.
 \midrule
 $k$ & heat index, $k = 1,\dots,10$ & – \\
 $I(t,\lambda)$ & flame intensity at time $t$ and wavelength $\lambda$ & counts \\
-$\mathbf{X}$ & log-intensity matrix (time \ensuremath{\times} wavelength) & – \\
-$\mathbf{L},\ \mathbf{S}$ & low-rank and sparse parts of $\mathbf{X}$ & – \\
-$r$ & rank of $\mathbf{L}$ & – \\
+$\bm{X}$ & log-intensity matrix (time \ensuremath{\times} wavelength) & – \\
+$\bm{L},\ \bm{S}$ & low-rank and sparse parts of $\bm{X}$ & – \\
+$r$ & rank of $\bm{L}$ & – \\
 $V(t)$ & cumulative oxygen consumption & m\ensuremath{^{3}} \\
-$Q(t)$ & lance oxygen flow, $Q = \mathrm{d}V/\mathrm{d}t$ & m\ensuremath{^{3}}/s \\
+$Q(t)$ & lance oxygen flow, $Q = \frac{\mathrm{d}V}{\mathrm{d}t}$ & m\ensuremath{^{3}}/s \\
 $y_{\mathrm{CO}}(t),\ y_{\mathrm{CO_2}}(t)$ & CO and CO\ensuremath{_{2}} readings of the analyzer & vol.\% \\
 $E_{\mathrm{CO}}(t),\ E_{\mathrm{CO_2}}(t)$ & time integrals of the readings & as in data \\
 $\Delta V_{\mathrm{pipe}}$ & equivalent duct volume, in oxygen units & m\ensuremath{^{3}} \\
@@ -162,7 +162,7 @@ All three tasks hinge on synchronizing an instantaneous optical observation at t
 \int_{t}^{t_{\mathrm{arr}}(t)} Q(s)\,\mathrm{d}s = V\bigl(t_{\mathrm{arr}}(t)\bigr) - V(t) = \Delta V_{\mathrm{pipe}}. \label{eq:1}
 \end{equation}
 
-Here $\Delta V_{\mathrm{pipe}}$ denotes the effective duct capacity expressed in equivalent cubic metres of blown oxygen, turning $V(t)$ into an intrinsic process clock valid under arbitrary lance-flow trajectories. Across any transit interval with average flow $\bar{Q}$, advection requires $\Delta V_{\mathrm{pipe}}/\bar{Q}$ seconds, defining the pure transport arrival $t_{\mathrm{arr}}(t)$. Incorporating a first-order mixing element of time constant $T_{\mathrm{mix}}$ to account for residual axial dispersion and analyzer response shifts the mean arrival by an additional $T_{\mathrm{mix}}$ seconds, yielding the steady-flow delay relation:
+Here $\Delta V_{\mathrm{pipe}}$ denotes the effective duct capacity expressed in equivalent cubic metres of blown oxygen, turning $V(t)$ into an intrinsic process clock valid under arbitrary lance-flow trajectories. Across any transit interval with average flow $\bar{Q}$, advection requires $\frac{\Delta V_{\mathrm{pipe}}}{\bar{Q}}$ seconds, defining the pure transport arrival $t_{\mathrm{arr}}(t)$. Incorporating a first-order mixing element of time constant $T_{\mathrm{mix}}$ to account for residual axial dispersion and analyzer response shifts the mean arrival by an additional $T_{\mathrm{mix}}$ seconds, yielding the steady-flow delay relation:
 
 \begin{equation}
 \tau(Q) = T_{\mathrm{mix}} + \frac{\Delta V_{\mathrm{pipe}}}{Q}. \label{eq:2}
@@ -191,13 +191,16 @@ A flame spectrum is a smooth thermal continuum with a few emission lines. As the
 \textbf{Step 2: Low-rank plus sparse decomposition.} We decompose
 
 \begin{equation}
-\mathbf{X} = \mathbf{L} + \mathbf{S} + \mathbf{N}, \qquad \operatorname{rank}(\mathbf{L}) \le r, \label{eq:3}
+\bm{X} = \bm{L} + \bm{S} + \bm{N}, \qquad \operatorname{rank}(\bm{L}) \le r, \label{eq:3}
 \end{equation}
 
-where $\mathbf{S}$ captures sparse outliers and $\mathbf{N}$ denotes small background noise. Classical principal component pursuit \cite{ref:1} fails to separate the noise here, yielding ranks of 426–446 in every heat. We therefore fix the rank and alternate two projections \cite{ref:2}:
+where $\bm{S}$ captures sparse outliers and $\bm{N}$ denotes small background noise. Classical principal component pursuit \cite{ref:1} fails to separate the noise here, yielding ranks of 426–446 in every heat. We therefore fix the rank and alternate two projections \cite{ref:2}:
 
 \begin{equation}
-\mathbf{L}^{(m)} = \mathcal{P}_r\!\bigl(\mathbf{X}-\mathbf{S}^{(m-1)}\bigr), \qquad S^{(m)}_{t\lambda} = \bigl(X_{t\lambda}-L^{(m)}_{t\lambda}\bigr)\,\mathbb{1}\!\bigl(\lvert X_{t\lambda}-L^{(m)}_{t\lambda}\rvert > 5\sigma_\lambda\bigr), \label{eq:rlr_alt}
+\begin{gathered}
+  \bm{L}^{(m)} = \mathcal{P}_r\!\bigl(\bm{X}-\bm{S}^{(m-1)}\bigr), \\
+  S^{(m)}_{t\lambda} = \bigl(X_{t\lambda}-L^{(m)}_{t\lambda}\bigr)\,\mathbb{1}\!\bigl(\lvert X_{t\lambda}-L^{(m)}_{t\lambda}\rvert > 5\sigma_\lambda\bigr),
+\end{gathered} \label{eq:rlr_alt}
 \end{equation}
 
 where $\mathcal{P}_r(\cdot)$ denotes the rank-$r$ truncated singular value decomposition and $\sigma_\lambda$ is the wavelength-specific robust residual scale. Iteration terminates once the outlier support stabilizes.
@@ -335,7 +338,7 @@ where $(x)_+ = \max(x,0)$, $\delta_m$ gives the slope change at breakpoint $V_m$
 \renewcommand{\arraystretch}{1.12}
 \begin{tabularx}{\linewidth}{@{}Z K{.24\linewidth} K{.22\linewidth} Z@{}}
 \toprule
-\textbf{Stage} & \textbf{Range of $V/V_{\mathrm{end}}$} & \textbf{CO share in CO+CO\ensuremath{_{2}}} & \textbf{Mean slope of $y_{\mathrm{CO}}$ (per m\ensuremath{^{3}})} \\
+\textbf{Stage} & \textbf{Range of $\frac{V}{V_{\mathrm{end}}}$} & \textbf{CO share in CO+CO\ensuremath{_{2}}} & \textbf{Mean slope of $y_{\mathrm{CO}}$ (per m\ensuremath{^{3}})} \\
 \midrule
 I. Early blow (CO\ensuremath{_{2}}-dominated) & 0–0.23 (\ensuremath{\pm}0.02) & 9.5–28.9\% & 0.012 \\
 II. Decarburization ramp-up & 0.23–0.43 (\ensuremath{\pm}0.06) & 51.0–61.3\% & 0.055 \\
@@ -361,15 +364,18 @@ To estimate $\Delta V_{\mathrm{pipe}}$ in Equation~(\ref{eq:1}), we need a signa
 \textbf{Step 1: Shifted generation curve.} The gas reaching the analyzer at cumulative oxygen $V$ was generated at $V^{+} = \max(V-\Delta V_{\mathrm{pipe}},\,0)$. We write the generation curve as
 
 \begin{equation}
-u(V) = g(V)\,\bigl[\eta + (1-\eta)\,s\bigl((V^{+}-V_{\mathrm{m}})/w_{\mathrm{m}}\bigr)\bigr]\; s\bigl(-(V^{+}-V_{\mathrm{e}})/w_{\mathrm{e}}\bigr), \label{eq:5}
+u(V) = g(V)\,\left[\eta + (1-\eta)\,s\!\left(\frac{V^{+}-V_{\mathrm{m}}}{w_{\mathrm{m}}}\right)\right]\; s\!\left(-\frac{V^{+}-V_{\mathrm{e}}}{w_{\mathrm{e}}}\right), \label{eq:5}
 \end{equation}
 
-where $s(\cdot)$ is the logistic function and $g(V) = s\bigl((V-\Delta V_{\mathrm{pipe}})/3.5\bigr)$ switches the signal on when the first gas arrives. The parameter $\eta$ sets the ignition level, $(V_{\mathrm{m}}, w_{\mathrm{m}})$ locates the main-blow rise, and $V_{\mathrm{e}}$ locates the end-of-blow decline with a transition width $w_{\mathrm{e}}$ fixed at 180 m\ensuremath{^{3}}.
+where $s(\cdot)$ is the logistic function and $g(V) = s\!\left(\frac{V-\Delta V_{\mathrm{pipe}}}{3.5}\right)$ switches the signal on when the first gas arrives. The parameter $\eta$ sets the ignition level, $(V_{\mathrm{m}}, w_{\mathrm{m}})$ locates the main-blow rise, and $V_{\mathrm{e}}$ locates the end-of-blow decline with a transition width $w_{\mathrm{e}}$ fixed at 180 m\ensuremath{^{3}}.
 
 \textbf{Step 2: Mixing and scaling.} A first-order mixing stage with time constant $T_{\mathrm{mix}}$ maps the shifted curve $u$ to the modelled oxygen-equivalent response $\tilde{y}_{\mathrm{ox}}$ via
 
 \begin{equation}
-y_{\mathrm{ox}}(t) = y_{\mathrm{CO_2}}(t) + 0.5\,y_{\mathrm{CO}}(t), \qquad T_{\mathrm{mix}}\,\frac{\mathrm{d}\tilde{y}_{\mathrm{ox}}}{\mathrm{d}t} + \tilde{y}_{\mathrm{ox}}(t) = c_k\,u\bigl(V(t)\bigr), \label{eq:pfd_mix}
+\begin{gathered}
+  y_{\mathrm{ox}}(t) = y_{\mathrm{CO_2}}(t) + 0.5\,y_{\mathrm{CO}}(t), \\
+  T_{\mathrm{mix}}\,\frac{\mathrm{d}\tilde{y}_{\mathrm{ox}}}{\mathrm{d}t} + \tilde{y}_{\mathrm{ox}}(t) = c_k\,u\bigl(V(t)\bigr),
+\end{gathered} \label{eq:pfd_mix}
 \end{equation}
 
 where $c_k$ is a heat-specific scale factor fitted linearly against the observed $y_{\mathrm{ox}}(t)$.
@@ -383,7 +389,7 @@ where $c_k$ is a heat-specific scale factor fitted linearly against the observed
 PFD gives $\Delta V_{\mathrm{pipe}} = 127.1$ m\ensuremath{^{3}} with a 95\% bootstrap interval of 123.4–132.6 m\ensuremath{^{3}} and a global $R^2$ of 0.976. The estimate is stable: calibrating it ten times, each time without one heat, gives 127.1 \ensuremath{\pm} 0.9 m\ensuremath{^{3}}. Substituting it into Equation~(\ref{eq:2}) gives
 
 \begin{equation}
-\tau(Q) = 5 + \frac{127.1}{Q}\ \text{s}. \label{eq:6}
+\tau(Q) = 5 + \frac{127.1}{Q}\,\mathrm{s}. \label{eq:6}
 \end{equation}
 
 Table~\ref{tab:6} evaluates Equation~(\ref{eq:6}) at typical flows. At the ignition flow of 2.35 m\ensuremath{^{3}}/s, the gas needs 59 s to reach the analyzer; in the main blow at 5 m\ensuremath{^{3}}/s, it needs 30 s. Doubling the flow from 3 to 6 m\ensuremath{^{3}}/s shortens the delay by 21 s. Fitting the 6B and 6C groups separately changes the transport time by at most 0.2 s.
@@ -416,7 +422,7 @@ Table~\ref{tab:6} evaluates Equation~(\ref{eq:6}) at typical flows. At the ignit
 
 \subsubsection{Validation against Main-Blow Onset Events}\label{sec:6.4.2}
 
-The value of $\Delta V_{\mathrm{pipe}}$ is anchored mainly by the arrival of the first gas after ignition. Because ignition itself takes some time, we check the model against the main blow (Table~\ref{tab:7}). When the lance flow first exceeds 3.5 m\ensuremath{^{3}}/s, the oxygen-equivalent signal crosses 13 vol.\% after 28–45.5 s in the ten heats, with a median of 34.5 s. These event times include the build-up of decarburization, so they bound the transport delay from above. For the mean flows of 4.4–6.6 m\ensuremath{^{3}}/s over these intervals, Equation~(\ref{eq:6}) gives 24–34 s, below the bound as expected. A regression of all twenty ignition and main-blow events on $1/Q$ reaches $R^2 = 0.74$.
+The value of $\Delta V_{\mathrm{pipe}}$ is anchored mainly by the arrival of the first gas after ignition. Because ignition itself takes some time, we check the model against the main blow (Table~\ref{tab:7}). When the lance flow first exceeds 3.5 m\ensuremath{^{3}}/s, the oxygen-equivalent signal crosses 13 vol.\% after 28–45.5 s in the ten heats, with a median of 34.5 s. These event times include the build-up of decarburization, so they bound the transport delay from above. For the mean flows of 4.4–6.6 m\ensuremath{^{3}}/s over these intervals, Equation~(\ref{eq:6}) gives 24–34 s, below the bound as expected. A regression of all twenty ignition and main-blow events on $\frac{1}{Q}$ reaches $R^2 = 0.74$.
 
 \subsubsection{Model-Free Check by Windowed Cross-Correlation}\label{sec:6.4.3}
 
@@ -445,7 +451,7 @@ First gas after ignition (upper bound) & 2.35 & median 49.8 \\
 \caption{Windowed cross-correlation delay estimates versus lance flow with PFD fit.}\label{fig:13}
 \end{figure}
 
-The windowed estimates fall faster with the flow than $1/Q$ does. This suggests that the duct volume is not the only factor; a higher flow may also enhance mixing and post-combustion in the hood. In the main-blow flow range of 4.4–6.6 m\ensuremath{^{3}}/s, Equation~(\ref{eq:6}) gives 24–34 s. These values stay below the two event-based upper bounds and agree with the constant delay of 31 s that maximizes spectral predictability. We therefore adopt Equation~(\ref{eq:6}) as the delay model for Task 3 and test the consequence of a \ensuremath{\pm}10\% error in $\Delta V_{\mathrm{pipe}}$ in Section~\ref{sec:8}.
+The windowed estimates fall faster with the flow than $\frac{1}{Q}$ does. This suggests that the duct volume is not the only factor; a higher flow may also enhance mixing and post-combustion in the hood. In the main-blow flow range of 4.4–6.6 m\ensuremath{^{3}}/s, Equation~(\ref{eq:6}) gives 24–34 s. These values stay below the two event-based upper bounds and agree with the constant delay of 31 s that maximizes spectral predictability. We therefore adopt Equation~(\ref{eq:6}) as the delay model for Task 3 and test the consequence of a \ensuremath{\pm}10\% error in $\Delta V_{\mathrm{pipe}}$ in Section~\ref{sec:8}.
 
 
 
@@ -462,25 +468,31 @@ All features use measurements up to time $t$ only. For each frame, we subtract t
 Three physical descriptors complement the scores: spectral centroid, spectral entropy, and a Wien colour temperature $T_{\mathrm{c}}(t)$ estimated across three line-free continuum windows (480–575, 610–750 and 785–960 nm) with $c_2 = 14{,}388$ µm·K. To suppress rapid flicker while preserving multi-scale trends causally, each descriptor $f(t)$ is smoothed by exponential moving averages at timescales of 5, 25, 80 and 200 s:
 
 \begin{equation}
-\ln\!\bigl(I(t,\lambda)\lambda^{5}\bigr) = a_0(t) - \frac{c_2}{T_{\mathrm{c}}(t)}\,\frac{1}{\lambda}, \qquad \bar{f}_{\gamma}(t) = \gamma\,f(t) + (1-\gamma)\,\bar{f}_{\gamma}(t-\Delta t), \label{eq:wien_ema}
+\begin{gathered}
+  \ln\!\bigl(I(t,\lambda)\lambda^{5}\bigr) = a_0(t) - \frac{c_2}{T_{\mathrm{c}}(t)}\,\frac{1}{\lambda}, \\
+  \bar{f}_{\gamma}(t) = \gamma\,f(t) + (1-\gamma)\,\bar{f}_{\gamma}(t-\Delta t),
+\end{gathered} \label{eq:wien_ema}
 \end{equation}
 
-where $\gamma = 1 - \exp(-\Delta t / \tau_{\mathrm{ema}})$ sets each causal decay rate, and causal process features further supply $V(t)$, lance flow and blowing progress.
+where $\gamma = 1 - \exp\!\left(-\frac{\Delta t}{\tau_{\mathrm{ema}}}\right)$ sets each causal decay rate, and causal process features further supply $V(t)$, lance flow and blowing progress.
 
 \subsection{Dual-Modal Soft Sensor (DSS)}\label{sec:7.2}
 
 \textbf{Step 1: Linear-tree predictor.} Pure tree ensembles cannot extrapolate beyond the training range, which matters for Heat 1 because its CO reading is the highest of all heats between 30\% and 65\% of total oxygen and peaks at 59 near mid-blow. We therefore combine a ridge linear head on bounded features with gradient-boosted residual trees \cite{ref:7}:
 
 \begin{equation}
-\hat{y}(t) = \hat{\boldsymbol{\beta}}^{\top}\mathbf{x}_{\mathrm{lin}}(t) + f_{\mathrm{GBDT}}\bigl(\mathbf{x}(t)\bigr), \label{eq:hybrid}
+\hat{y}(t) = \hat{\bm{\beta}}^{\top}\bm{x}_{\mathrm{lin}}(t) + f_{\mathrm{GBDT}}\bigl(\bm{x}(t)\bigr), \label{eq:hybrid}
 \end{equation}
 
-where $\hat{\boldsymbol{\beta}}^{\top}\mathbf{x}_{\mathrm{lin}}(t)$ captures global linear trends and $f_{\mathrm{GBDT}}$ fits the remaining nonlinear structure.
+where $\hat{\bm{\beta}}^{\top}\bm{x}_{\mathrm{lin}}(t)$ captures global linear trends and $f_{\mathrm{GBDT}}$ fits the remaining nonlinear structure.
 
-\textbf{Step 2: Model combination.} Models trained on a single heat fail to transfer: across all off-diagonal pairs, the median R\ensuremath{^{2}} is \ensuremath{-}0.02 and 52\% of pairs are negative. We therefore combine training heats rather than selecting one. Three schemes address the combination requirement: pooling all training heats, hard grouping by converter or cluster, and soft-gated weighting by similarity to the test heat. For the soft-gated scheme, let $\mathbf{d}_j$ be a fingerprint of heat $j$ computed from its first 60 s: the mean normalized spectrum, mean Task-1 scores, mean flow and mean log total intensity. Training heat $j$ receives sample weight
+\textbf{Step 2: Model combination.} Models trained on a single heat fail to transfer: across all off-diagonal pairs, the median R\ensuremath{^{2}} is \ensuremath{-}0.02 and 52\% of pairs are negative. We therefore combine training heats rather than selecting one. Three schemes address the combination requirement: pooling all training heats, hard grouping by converter or cluster, and soft-gated weighting by similarity to the test heat. For the soft-gated scheme, let $\bm{d}_j$ be a fingerprint of heat $j$ computed from its first 60 s: the mean normalized spectrum, mean Task-1 scores, mean flow and mean log total intensity. Training heat $j$ receives sample weight
 
 \begin{equation}
-w_j = 0.55 + 0.45\,M\,\pi_j, \qquad \pi_j \propto \exp\Bigl(-0.65\,\frac{\lVert\mathbf{d}_j-\mathbf{d}_{\mathrm{test}}\rVert^2}{\operatorname{med}_i\lVert\mathbf{d}_i-\mathbf{d}_{\mathrm{test}}\rVert^2} + 0.55\,\mathbb{1}_{\text{same group}}\Bigr), \label{eq:7}
+\begin{gathered}
+  w_j = 0.55 + 0.45\,M\,\pi_j, \\
+  \pi_j \propto \exp\Bigl(-0.65\,\frac{\lVert\bm{d}_j-\bm{d}_{\mathrm{test}}\rVert^2}{\operatorname{med}_i\lVert\bm{d}_i-\bm{d}_{\mathrm{test}}\rVert^2} + 0.55\,\mathbb{1}_{\text{same group}}\Bigr),
+\end{gathered} \label{eq:7}
 \end{equation}
 
 where $M$ is the number of training heats and $\sum_j \pi_j = 1$. The uniform term retains information from every heat, while the similarity term emphasizes heats with comparable ignition profiles. The fingerprint uses only the first 60 s of the test heat, so the weights are fixed one minute after ignition, before the main decarburization starts, and use no later data.
@@ -550,9 +562,9 @@ The DSS shifts the probe from a continuous sensor to an occasional calibrator. F
 
 This trade-off yields clear operating points. Sampling every 60 s saves 99.2\% of probe readings while maintaining CO R\ensuremath{^{2}} at 0.920; sampling every 30 s saves 98.3\% and reaches 0.934. In a partial least squares analysis, the highest-importance wavelengths lie at 765–770 nm and 590 nm, the potassium and sodium lines isolated in Task 1, followed by the 730–825 nm continuum. The same atomic emission lines thus separate sparse outliers in Task 1 and carry off-gas information in Task 3.
 
-\begin{figure}[!p]
+\begin{figure}[!htbp]
 \centering
-\includegraphics[width=\linewidth,height=.92\textheight,keepaspectratio]{figures/fig15_transfer_probe_vip.pdf}
+\includegraphics[width=\linewidth,height=.88\textheight,keepaspectratio]{figures/fig15_transfer_probe_vip.pdf}
 \caption{Cross-heat transfer, probe-saving trade-off and wavelength importance.}\label{fig:15}
 \end{figure}
 
@@ -626,7 +638,7 @@ We developed a delay-aware framework that fuses real-time flame spectra with del
 
 For Task 1, our Rank-Constrained Robust Low-Rank model decomposed each log spectrum into three physical components and sparse outliers. It detected injected spikes with an F1 score of 0.89, reconstructed held-out pixels within a 2.0\% relative error and generated continuous spectral surfaces for all ten heats.
 
-For Task 2, the reconstructed process signals revealed four blowing stages with breakpoints at 23\%, 43\% and 90\% of total oxygen. The Plug-Flow Delay model yielded $\tau(Q) = 5 + 127.1/Q$ s, which drops from 47.4 s at 3 m\ensuremath{^{3}}/s to 30.4 s at 5 m\ensuremath{^{3}}/s, and independent checks confirmed that delay decreases with flow.
+For Task 2, the reconstructed process signals revealed four blowing stages with breakpoints at 23\%, 43\% and 90\% of total oxygen. The Plug-Flow Delay model yielded $\tau(Q) = 5 + \frac{127.1}{Q}\,\mathrm{s}$, which drops from 47.4 s at 3 m\ensuremath{^{3}}/s to 30.4 s at 5 m\ensuremath{^{3}}/s, and independent checks confirmed that delay decreases with flow.
 
 For Task 3, the Dual-Modal Soft Sensor combined heat-level models through causal similarity weighting. Without probe readings, it predicted delay-aligned CO and CO\ensuremath{_{2}} at mean R\ensuremath{^{2}} of 0.873 and 0.658 across all ten heats; adding one probe reading every 120 s raised R\ensuremath{^{2}} to 0.908 and 0.695. Flame spectra can thus replace most probe readings while delivering off-gas information roughly 30 s earlier.
 
