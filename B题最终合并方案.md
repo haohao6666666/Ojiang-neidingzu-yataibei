@@ -85,7 +85,7 @@
 | 平推流模型（B 版） | 30.4 s（95% CI 29.7–31.5 s） | B 版 `q2_delay_vs_flowrate_table.csv` |
 | 光谱可预测性准则，输运模型 τ = 170/Q（A 版） | 34 s | A 版 `q2_delay_params.csv` |
 | 常数时延（A 版） | 31 s | 同上 |
-| 主吹阶段流量阶跃事件（B 版，Q = 4.4–6.6） | 28–45.5 s，中位约 34.5 s | B 版 `q2_step_response_delay_events.csv`（只用 MainRamp 行） |
+| 主吹起始事件（B 版，Q = 4.4–6.6；从流量超过 3.5 m³/s 到氧当量信号超过 13 的时间，含反应建立时间，是输运时延的**上界**） | 28–45.5 s，中位约 34.5 s | B 版 `q2_step_response_delay_events.csv`（只用 MainRamp 行） |
 | 滑动窗口互相关（A 版，44 个窗口） | 中位 40.5 s；**时延与流量 Spearman ρ = −0.75，p = 3×10⁻⁹** | A 版 `q2_delay_auxiliary.csv`、`q2_delay_window_bins.csv` |
 | 开吹到出现烟气（含点火时间，上界） | 多数炉 44–52 s（Q ≈ 2.4） | A 版 `q2_delay_by_heat.csv`；B 版事件表的 Ignition 行 |
 
