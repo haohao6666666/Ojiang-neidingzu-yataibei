@@ -14,13 +14,13 @@
 
 In converter steelmaking, the mouth flame reflects bath reactions in real time, whereas the flue-gas analyzer reports them only after the gas crosses the duct, about half a minute later. We develop a **Delay-Aware Dual-Modal Framework** that cleans both streams, quantifies the transport delay and infers the off-gas state from the flame before the analyzer measures it.
 
-Before modelling, we diagnose four data anomalies. We adopt the corrected Attachment 1 and establish a sampling interval of 1 s for Heat 5. Because the cumulative-oxygen counter advances in steps of about 4.73 m³ with a double step every 11 s, we estimate the lance flow from a 24-s regression slope rather than direct differencing. A carbon–oxygen balance shows that, read as flow rates, the CO and CO₂ values would demand **5.5–6.5 times** the supplied oxygen; we therefore interpret them as volume fractions.
+Before modelling, we diagnose four data anomalies. We adopt the corrected Attachment 1 and establish a sampling interval of 1 s for Heat 5. Because the cumulative-oxygen counter advances in steps of about 4.73 m³ with a double step every 11 s, we estimate the lance flow from a 24-s regression slope rather than direct differencing. A carbon–oxygen balance shows that, read as flow rates, the CO and CO₂ values would require **5.5–6.5 times** the supplied oxygen; we therefore interpret them as volume fractions.
 
 **Task 1: Spectral cleaning and continuity.** We build a **Rank-Constrained Robust Low-Rank model (RLR)** that separates each log spectrum into three components and sparse outliers. The first component tracks flame brightness and the second tracks spectral colour. In an injection test, RLR detects spikes with an F1 score of **0.89** (Hampel filter: 0.22), and the continuous surface reconstructs held-out pixels with a relative error of **2.0%**. Sparse outliers concentrate on the potassium and sodium lines, which fluctuate independently of the thermal continuum.
 
 **Task 2: Oxygen, gas and delay.** We reconstruct six continuous process curves per heat and identify four blowing stages, with breakpoints at **23%, 43% and 90%** of the total oxygen (piecewise R² = 0.956–0.997). In the cumulative-oxygen coordinate, the gas trajectories of all ten heats collapse onto one curve, which the **Plug-Flow Delay model (PFD)** fits with R² = 0.976. The model gives **τ(Q) = 5 + 127.1/Q s**, so the delay drops from 47.4 s at 3 m³/s to **30.4 s** at 5 m³/s. Windowed cross-correlation independently confirms that the delay decreases with the flow (Spearman ρ = −0.75, p = 3.4×10⁻⁹).
 
-**Task 3: Real-time prediction.** We build a **Dual-Modal Soft Sensor (DSS)** that projects each frame onto a cross-heat spectral basis learned from the RLR-cleaned training spectra. It aligns the prediction target with the PFD arrival map and combines heat-level models through similarity weighting. Under leave-one-heat-out validation across all ten heats, the zero-probe DSS predicts CO and CO₂ with mean R² of **0.873** and **0.658**. A Smith-type correction with one probe reading every 120 s—**99.6% fewer readings**—raises R² to **0.908** and **0.695**, about 30 s ahead of the analyzer.
+**Task 3: Real-time prediction.** We build a **Dual-Modal Soft Sensor (DSS)** that projects each frame onto a cross-heat spectral basis learned from the cleaned training spectra of Task 1. It aligns the prediction target with the PFD arrival map and combines heat-level models through similarity weighting. Under leave-one-heat-out validation across all ten heats, the zero-probe DSS predicts CO and CO₂ with mean R² of **0.873** and **0.658**. A Smith-type correction with one probe reading every 120 s (**99.6% fewer readings**) raises R² to **0.908** and **0.695**, about 30 s ahead of the analyzer.
 
 Sensitivity analysis shows that a ±10% error in the duct volume shifts the zero-probe R² by at most 0.003, and that the stage and delay results hold across both converter groups. Flame spectra can thus replace most probe readings while delivering off-gas information earlier.
 
@@ -38,9 +38,9 @@ Sensitivity analysis shows that a ±10% error in the duct volume shifts the zero
 
 ### 1.1 Background
 
-The basic oxygen converter turns hot metal into steel by blowing high-purity oxygen through a lance at supersonic speed. Silicon, manganese, phosphorus and carbon are oxidized in turn, and the carbon leaves the bath as CO and CO₂. Operators must time the end of the blow so that the carbon content and temperature of the steel reach their targets together [11]. They therefore follow the progress of decarburization from two sources. A spectrometer at the converter mouth records the flame radiation every 0.5 s [12], and a Raman analyzer at the flue-gas bend records the CO and CO₂ contents at the same rate.
+The basic oxygen converter turns hot metal into steel by blowing high-purity oxygen through a lance at supersonic speed. Silicon, manganese, phosphorus and carbon are oxidized in turn, and the carbon leaves the bath as CO and CO₂. Operators must time the end of the blow so that the carbon content and temperature of the steel reach their targets together [11]. They therefore follow the progress of decarburization from two sources. A spectrometer at the converter mouth records the flame radiation every 0.5 s, and a Raman analyzer at the flue-gas bend records the CO and CO₂ contents at the same rate.
 
-The two sources see the same reactions at different times. The flame responds to the bath immediately, while the gas must travel through the hood and the duct before the analyzer can measure it. This transport delay limits endpoint control, because a decision based on the analyzer refers to a bath state that is already half a minute old [11, 13]. The sampling probe also wears quickly in the dusty, high-temperature duct, so frequent sampling is costly. A data-driven soft sensor that reads the off-gas state from the flame [12, 13] would provide the signal earlier and would allow the probe to work less often.
+The two sources see the same reactions at different times. The flame responds to the bath immediately, while the gas must travel through the hood and the duct before the analyzer can measure it. This transport delay limits endpoint control, because a decision based on the analyzer refers to a bath state that is already half a minute old. The sampling probe also wears quickly in the dusty, high-temperature duct, so frequent sampling is costly. A data-driven soft sensor that reads the off-gas state from the flame [12, 13] would provide the signal earlier and would allow the probe to work less often.
 
 > **[Figure 1 — PLACEHOLDER]** 自绘示意图：转炉、氧枪、炉口光谱仪（标注 real-time）、烟罩与烟道、弯头处拉曼分析仪（标注 delayed），烟道中画出气团输运箭头，标出 $\Delta V_{\mathrm{pipe}}$。宽度 0.7。
 > Caption: **Dual-modal measurement at the converter.** The spectrometer observes the flame in real time; the analyzer observes the same reactions after the gas has crossed the duct volume $\Delta V_{\mathrm{pipe}}$.
@@ -125,11 +125,11 @@ Each attachment contains about 1,400 spectra of 2,047 wavelengths and the corres
 
 ### 3.1 Two Converter Groups and a Unified Wavelength Grid
 
-Heats 1–4 (prefix 6B) cover 340.535–1027.963 nm, whereas Heats 5–10 (prefix 6C) cover 339.390–1023.303 nm. Both grids have 2,047 points. We interpolate every spectrum onto a common grid from 341 to 1023 nm with a 1-nm step. Pixels that reach the 16-bit limit of 65,535 counts are saturated; we treat them as right-censored values rather than as measurements. Saturation occurs mainly in the 6C group and affects at most 0.27% of the pixels of a heat. The different calibrations indicate two converters or two instruments, which we use later as a natural grouping of the heats.
+Heats 1–4 (prefix 6B) cover 340.535–1027.963 nm, whereas Heats 5–10 (prefix 6C) cover 339.390–1023.303 nm. Both grids have 2,047 points. We interpolate every spectrum onto a common grid from 341 to 1023 nm with a 1-nm step. Pixels that reach the 16-bit limit of 65,535 counts are saturated; their true values are only known to exceed this limit, so we exclude them from every fit rather than use them as measurements. Saturation occurs mainly in the 6C group and affects at most 0.27% of the pixels of a heat. The different calibrations indicate two converters or two instruments, which we use later as a natural grouping of the heats.
 
 ### 3.2 Corrected Attachment 1 and the Time Step of Heat 5
 
-The original Attachment 1 contains zeros in both gas columns. We use the corrected file, whose spectra and oxygen records match the original file value for value. Heat 5 has only 775 records, although it consumes 3,540 m³ of oxygen, as much as the other heats. Three observations indicate that its step is 1 s rather than 0.5 s. First, a 1-s step yields a blowing time of 12.9 min, well within the 10.9–13.0 min range of the other heats. Second, its oxygen increment per record is twice the typical value. Third, its counter-beat spacing (Section 3.3) shifts from 11 s to 3 s, reflecting a different logger-to-counter cadence. We adopt the 1-s step and evaluate the 0.5-s alternative in the sensitivity analysis.
+The original Attachment 1 contains zeros in both gas columns. We use the corrected file, whose spectra and oxygen records match the original file value for value. Heat 5 has only 775 records, although it consumes 3,540 m³ of oxygen, as much as the other heats. Three observations indicate that its step is 1 s rather than 0.5 s. First, a 1-s step yields a blowing time of 12.9 min, well within the 10.9–13.0 min range of the other heats. Second, its oxygen increment per record is twice the typical value. Third, its counter-beat spacing (Section 3.3) is 3 s instead of 11 s. We adopt the 1-s step and evaluate the 0.5-s alternative in the sensitivity analysis.
 
 ### 3.3 Beat Artifact of the Oxygen Counter
 
@@ -180,7 +180,7 @@ Task 1 asks for two things: the removal of outliers and a continuous surface tha
 
 A flame spectrum is a smooth thermal continuum with a few emission lines. As the blow proceeds, the temperature and the line intensities change, but the spectral shapes stay within a small family. The log-intensity matrix of a heat is therefore nearly low-rank, while spikes and corrupted frames are sparse. RLR uses this structure in four steps.
 
-**Step 1: Log transform and censoring.** We set $X_{t\lambda} = \ln I(t,\lambda)$ on the unified grid and exclude saturated pixels from the observed set. [[WY: 前文第三节与第九节称饱和点按“右删失 (right-censored)”处理，而此处写成当缺失值处理未提下界约束；建议确认此处是否补一句“并在饱和重构检验中施加下界约束不得低于饱和阈值”，且附录 C 补列 B 版的饱和恢复诊断图 q1_saturation_and_peak_diagnostic.pdf 与 K 双线保真率]] The log transform converts multiplicative flicker into an additive shift that a single component can absorb.
+**Step 1: Log transform and saturation mask.** We set $X_{t\lambda} = \ln I(t,\lambda)$ on the unified grid and exclude saturated pixels from the observed set; the low-rank completion of Step 4 fills them. The log transform converts multiplicative flicker into an additive shift that a single component can absorb.
 
 **Step 2: Low-rank plus sparse decomposition.** We decompose
 
@@ -296,7 +296,7 @@ $$
 u(V) = g(V)\,\bigl[\eta + (1-\eta)\,s\bigl((V^{+}-V_{\mathrm{m}})/w_{\mathrm{m}}\bigr)\bigr]\; s\bigl(-(V^{+}-V_{\mathrm{e}})/w_{\mathrm{e}}\bigr), \tag{5}
 $$
 
-where $s(\cdot)$ is the logistic function and $g(V) = s\bigl((V-\Delta V_{\mathrm{pipe}})/3.5\bigr)$ switches the signal on when the first gas arrives. The parameter $\eta$ sets the ignition level, $(V_{\mathrm{m}}, w_{\mathrm{m}})$ locates the main-blow rise, and $V_{\mathrm{e}}$ locates the end-of-blow decline with a fixed transition width $w_{\mathrm{e}}$. [[WY: 代码中 w_e 固定为常数，故实际待估自由参数正好是五个（ΔV_pipe, η, V_m, w_m, V_e）；原句把 w_e 与其余参数并列导致前文数出六个参数、后文写 five parameters，现已改为固定过渡宽度并建议确认是否显式写出具体数值]]
+where $s(\cdot)$ is the logistic function and $g(V) = s\bigl((V-\Delta V_{\mathrm{pipe}})/3.5\bigr)$ switches the signal on when the first gas arrives. The parameter $\eta$ sets the ignition level, $(V_{\mathrm{m}}, w_{\mathrm{m}})$ locates the main-blow rise, and $V_{\mathrm{e}}$ locates the end-of-blow decline with a transition width $w_{\mathrm{e}}$ fixed at 180 m³.
 
 **Step 2: Mixing and scaling.** A first-order filter with time constant $T_{\mathrm{mix}}$ converts $u$ into the modelled reading, and a heat-specific factor scales it to the data.
 
@@ -330,7 +330,7 @@ The value of $\Delta V_{\mathrm{pipe}}$ is anchored mainly by the arrival of the
 
 #### 6.4.3 Model-Free Check by Windowed Cross-Correlation
 
-This check requires no transport model. A cross-correlation between the first spectral component and CO over 120-s windows yields 44 windows with a distinct peak. Their delay decreases as window-mean flow increases (Spearman $\rho = -0.75$, $p = 3.4\times10^{-9}$), falling from 63 s in the 4.5–5.0 m³/s bin to 14.5 s above 5.5 m³/s (Figure 13). [[WY: 核对 q2_delay_window_bins.csv 共有四档，最低流量档（小于四点五，三个窗口）中位时延更高，下方图注也写了 four flow bins，建议确认此处是否补提最低流量档以与图注四档完全对应]] Because window time correlates only weakly with flow ($\rho = -0.12$), this decline is not a stage artifact.
+This check requires no transport model. A cross-correlation between the first spectral component and CO over 120-s windows yields 44 windows with a distinct peak. Their delay decreases as window-mean flow increases (Spearman $\rho = -0.75$, $p = 3.4\times10^{-9}$), falling from 89 s below 4.5 m³/s (three windows) and 63 s at 4.5–5.0 m³/s to 31 s at 5.0–5.5 m³/s and 14.5 s above 5.5 m³/s (Figure 13). Because window time correlates only weakly with flow ($\rho = -0.12$), this decline is not a stage artifact.
 
 > **Table 7. Delay estimates from independent methods**
 
@@ -365,7 +365,7 @@ Three physical descriptors complement the scores. We derive a colour temperature
 
 ### 7.2 Dual-Modal Soft Sensor (DSS)
 
-**Step 1: Linear-tree predictor.** A ridge regression on bounded linear features captures global trends and supports extrapolation beyond the training range—especially relevant for Heat 1, whose mid-blow CO plateau reaches 59 and exceeds all other heats during main decarburization. [[WY: 核对原始数据发现第三炉吹炼末段 CO 峰值达六十三点八，高于第一炉的五十九（下方十炉预测图第三子图肉眼可见破六十），但第一炉的中吹平台峰值（五十九）和全程均值（三十三点六）均为全场最高；已将四处“全炉最高峰值”改为“中吹平台峰值超过其余炉次”，请复核确认]] Gradient-boosted trees [7] then model the residual nonlinearity.
+**Step 1: Linear-tree predictor.** A ridge regression on bounded linear features captures global trends and supports extrapolation beyond the training range. This matters for Heat 1, whose CO reading is the highest of all heats between 30% and 65% of the total oxygen and peaks at 59 near the middle of the blow. Gradient-boosted trees [7] then model the residual nonlinearity.
 
 **Step 2: Model combination.** Models trained on a single heat fail to transfer: across all off-diagonal pairs, the median R² is −0.02 and 52% of pairs are negative. We therefore combine training heats rather than selecting one. Three schemes address the combination requirement: pooling all training heats, hard grouping by converter or cluster, and soft-gated weighting by similarity to the test heat. For the soft-gated scheme, let $\mathbf{d}_j$ be a fingerprint of heat $j$ computed from its first 60 s: the mean normalized spectrum, mean Task-1 scores, mean flow and mean log total intensity. Training heat $j$ receives sample weight
 
@@ -373,9 +373,9 @@ $$
 w_j = 0.55 + 0.45\,M\,\pi_j, \qquad \pi_j \propto \exp\Bigl(-0.65\,\frac{\lVert\mathbf{d}_j-\mathbf{d}_{\mathrm{test}}\rVert^2}{\operatorname{med}_i\lVert\mathbf{d}_i-\mathbf{d}_{\mathrm{test}}\rVert^2} + 0.55\,\mathbb{1}_{\text{same group}}\Bigr), \tag{7}
 $$
 
-where $M$ is the number of training heats and $\sum_j \pi_j = 1$. The uniform term retains information from every heat, while the similarity term emphasizes heats with comparable ignition profiles. Once the first 60 s of ignition elapse—before main decarburization begins—the weights remain fixed online (with uniform weights usable during the initial minute).
+where $M$ is the number of training heats and $\sum_j \pi_j = 1$. The uniform term retains information from every heat, while the similarity term emphasizes heats with comparable ignition profiles. The fingerprint uses only the first 60 s of the test heat, so the weights are fixed one minute after ignition, before the main decarburization starts, and use no later data.
 
-**Step 3: Validation protocol.** The outer loop runs leave-one-heat-out (LOHO) validation, so each of the ten heats is predicted by a model trained strictly without it. Every data-driven quantity—including the cross-heat spectral basis and $\Delta V_{\mathrm{pipe}}$—is recalibrated inside each fold. An inner eight-versus-one loop selects the correction gain and conformal interval width, ensuring the test heat does not enter any tuning step. Two automated tests verify this isolation: corrupting future frames of a heat leaves all earlier predictions unchanged, and corrupting the test heat leaves all trained quantities unchanged.
+**Step 3: Validation protocol.** The outer loop runs leave-one-heat-out (LOHO) validation, so each of the ten heats is predicted by a model trained strictly without it. Every data-driven quantity, including the cross-heat spectral basis and $\Delta V_{\mathrm{pipe}}$, is recalibrated inside each fold. An inner eight-versus-one loop selects the correction gain and conformal interval width, ensuring the test heat does not enter any tuning step. Two automated tests verify this isolation: corrupting future frames of a heat leaves all earlier predictions unchanged, and corrupting the test heat leaves all trained quantities unchanged.
 
 **Step 4: Smith-type correction.** A probe reading arriving at time $t$ verifies the earlier prediction made at $t_{\mathrm{arr}}^{-1}(t)$, following the Smith predictor for dead-time systems [8]. The verified error updates a smoothed bias term that corrects the current prediction:
 
@@ -411,23 +411,23 @@ The process features alone already explain much of the CO variation, because the
 
 #### 7.3.2 Generalization to All Ten Heats
 
-Figure 14 presents the LOHO predictions across all ten heats. The zero-probe DSS tracks ignition, decarburization ramp-up and end-of-blow decline in every heat. Its CO R² exceeds 0.85 in seven heats and spans 0.67 to 0.97 overall. CO₂ accuracy is lower in Heats 5 (0.33), 1 (0.39) and 9 (0.50). Heat 1 sustains an unusually high mid-blow CO plateau above the training heats at matched oxygen consumption, while Heat 5 combines coarser 1-s sampling with the highest saturation rate.
+Figure 14 presents the LOHO predictions across all ten heats. The zero-probe DSS tracks ignition, decarburization ramp-up and end-of-blow decline in every heat. Its CO R² exceeds 0.85 in seven heats and spans 0.67 to 0.97 overall. CO₂ accuracy is lower in Heats 5 (0.33), 1 (0.39) and 9 (0.50). Heat 1 has a higher CO reading than every other heat in the first half of the main blow, while Heat 5 combines coarser 1-s sampling with the highest saturation rate.
 
-The conformal intervals perform as designed. Without probe readings, the 90% intervals average a half-width of 10.1 for CO and cover 87.0% of readings. Coverage drops to 62% in the two highest-CO heats (Heats 1 and 3) and reaches 76–100% in the remaining heats. Under continuous correction, the half-width narrows to 5.7, and coverage reaches 89.8% for CO and 89.75% for CO₂, close to the nominal target level.
+The conformal intervals perform as designed. Without probe readings, the 90% intervals average a half-width of 10.1 for CO and cover 87.0% of readings. Coverage drops to 62% in the two heats with the highest CO readings (Heats 1 and 3) and reaches 76–100% in the remaining heats. Under continuous correction, the half-width narrows to 5.7, and coverage reaches 89.8% for CO and 89.75% for CO₂, close to the nominal target level.
 
 > **[Figure 14]** `solution_v4_verified/solution_outputs/figures/q3_all10_loho_predictions.pdf`，宽度 1.0，占大半页。
-> Caption: **Leave-one-heat-out predictions of CO and CO₂ for the ten heats** with 90% conformal intervals. The model tracks every blowing stage; Heat 1, with its elevated mid-blow CO plateau, poses the hardest extrapolation case.
+> Caption: **Leave-one-heat-out predictions of CO and CO₂ for the ten heats** with 90% conformal intervals. The model tracks every blowing stage; Heat 1, whose CO in the first half of the main blow exceeds that of all other heats, is the hardest extrapolation case.
 
 #### 7.3.3 Reducing Probe Usage
 
 The DSS shifts the probe from a continuous sensor to an occasional calibrator. Figure 15 (middle) plots accuracy against probe interval. With one reading every 120 s, corrected predictions reach CO R² = 0.908 and CO₂ R² = 0.695, whereas holding the lagged reading yields only 0.593 and −1.04. Even under continuous sampling, the corrected prediction outperforms the lagged reading (0.949 versus 0.916 for CO) by compensating for the 30-s transport delay.
 
-This trade-off yields clear operating points. Sampling every 60 s saves 99.2% of probe readings while maintaining CO R² at 0.920; sampling every 30 s saves 98.3% and reaches 0.934. In a partial least squares analysis, the highest-importance wavelengths lie at 765–770 nm and 590 nm—the same potassium and sodium lines isolated in Task 1—followed by the 730–825 nm continuum. The same atomic emission lines thus separate sparse outliers in Task 1 and carry off-gas information in Task 3.
+This trade-off yields clear operating points. Sampling every 60 s saves 99.2% of probe readings while maintaining CO R² at 0.920; sampling every 30 s saves 98.3% and reaches 0.934. In a partial least squares analysis, the highest-importance wavelengths lie at 765–770 nm and 590 nm, the potassium and sodium lines isolated in Task 1, followed by the 730–825 nm continuum. The same atomic emission lines thus separate sparse outliers in Task 1 and carry off-gas information in Task 3.
 
 > **[Figure 15]** `solution_v4_verified/solution_outputs/figures/q3_transfer_pareto_and_vip.pdf`，宽度 1.0。
 > Caption: **Cross-heat transfer, probe-saving trade-off and wavelength importance.** Left: single-heat transfer matrix showing poor one-to-one generalization. Middle: with one reading every 120 s, Smith correction keeps CO R² above 0.9, whereas the lagged reading falls to 0.59. Right: potassium and sodium lines carry the highest PLS VIP scores.
 
-> 数字出处（不进论文）：B 版 `q3_loho_ablation_summary.csv`、`q3_loho_per_heat_metrics.csv`（Combined_SoftGated_Hybrid 逐炉 CO：0.673/0.775/0.806/0.939/0.897/0.959/0.856/0.962/0.970/0.891；CO₂ 最弱为 H05 0.333、H01 0.386、H09 0.495）、`q3_single_heat_transfer_matrix.csv`、`q3_conformal_90pct_coverage.csv`（零探头 CO 逐炉 0.62–1.00、均值 0.870、半宽 10.14；连续校正半宽 5.65）、`q3_transition_regime_rmse.csv`、`q3_pls_vip_wavelength.csv`、`verification_audit_report.csv`（第 5、6 项泄漏检验）；颜色温度与指纹定义见 `q3_fusion_predict.py`。
+> 数字出处（不进论文）：B 版 `q3_loho_ablation_summary.csv`、`q3_loho_per_heat_metrics.csv`（Combined_SoftGated_Hybrid 逐炉 CO：0.673/0.775/0.806/0.939/0.897/0.959/0.856/0.962/0.970/0.891；CO₂ 最弱为 H05 0.333、H01 0.386、H09 0.495）、`q3_single_heat_transfer_matrix.csv`、`q3_conformal_90pct_coverage.csv`（零探头 CO 逐炉 0.62–1.00、均值 0.870、半宽 10.14；连续校正半宽 5.65）、`q3_transition_regime_rmse.csv`、`q3_pls_vip_wavelength.csv`、`verification_audit_report.csv`（第 5、6 项泄漏检验）；颜色温度与指纹定义见 `q3_fusion_predict.py`；Heat 1/Heat 3 的 CO 比较（30%–65% 耗氧区间 Heat 1 最高，70% 之后 Heat 3 最高，峰值 63.8）见 `B_results/tables/q3_co_by_oxygen_fraction.csv`（由原始数据按耗氧分数分箱取中位数）。
 
 ---
 
@@ -452,7 +452,7 @@ For Task 1, a stricter threshold removes fewer pixels but leaves the number of a
 
 For Task 2, the mixing constant and the duct volume trade off against each other. The total delay at the main-blow flow still varies by less than 6 s, and the two converter groups share one duct model. The choice of the time step of Heat 5 also has a negligible effect.
 
-The most critical check concerns Task 3, where the delay defines the prediction target. We perturb the duct volume by ±10% during both training and Smith correction while still evaluating against the calibrated target. Zero-probe accuracy shifts by at most 0.003, and corrected CO accuracy likewise stays within 0.003. By contrast, CO₂ correction improves slightly as the assumed volume grows. This aligns with the spectral-predictability criterion, whose constant lag maximizing predictability is 72 s for CO₂ versus 31 s for CO. Downstream post-combustion of CO to CO₂ in the hood and sampling line may therefore introduce an extra apparent lag for CO₂.
+The most critical check concerns Task 3, where the delay defines the prediction target. We perturb the duct volume by ±10% during both training and Smith correction while still evaluating against the calibrated target. Zero-probe accuracy shifts by at most 0.003, and corrected CO accuracy likewise stays within 0.003. By contrast, CO₂ correction improves slightly as the assumed volume grows. This aligns with the spectral-predictability criterion, whose constant lag maximizing predictability is 72 s for CO₂ versus 31 s for CO. Both results suggest that the CO₂ reading follows the flame more slowly than the CO reading; the present data do not identify the cause.
 
 > 数字出处（不进论文）：A 版 `q1_threshold_sensitivity.csv`、`q1_rank_selection.csv`、`q2_delay_model_comparison.csv`（CO₂ 最优常数时延 72 s）、`q3_delay_misestimation_sensitivity.csv`（本次补算，脚本 `B_results/code/sens_delay_misestimation.py`）；B 版 `q2_tmix_identifiability_sensitivity.csv`、`q2_delay_vs_flowrate_table.csv`、`q3_loho_ablation_summary.csv`。
 
@@ -463,15 +463,15 @@ The most critical check concerns Task 3, where the delay defines the prediction 
 ### 9.1 Strengths
 
 - **Data-consistency diagnosis.** Before fitting any model, we adopt the corrected Attachment 1, establish the 1-s step of Heat 5, suppress the oxygen-counter beat and show that the gas readings are volume fractions.
-- **Unified low-rank structure for cleaning and continuity.** RLR uses the same three components to detect outliers, handle censored pixels and build continuous surfaces, with each step verified by injection testing.
+- **Unified low-rank structure for cleaning and continuity.** RLR uses the same three components to detect outliers, fill saturated pixels and build continuous surfaces, with each step verified by injection testing.
 - **Physically grounded delay model.** PFD derives flow dependence from plug-flow transport. Its main-blow delay agrees with independent constant-delay estimates, stays below event-based upper bounds and matches the negative delay–flow trend from windowed cross-correlation.
 - **Strictly causal, leakage-free validation.** Every learned parameter is recalibrated within each LOHO fold, and the test heat does not enter any tuning step.
 - **Practical soft sensor.** The DSS forecasts off-gas states about 30 s ahead while keeping CO R² above 0.9 with 99.6% fewer probe readings.
 
 ### 9.2 Weaknesses
 
-- **Limited sample of ten heats.** Elevated CO levels in Heat 1 push the zero-probe model into extrapolation, reducing coverage to 62%. Additional heats—particularly high-carbon blows—would widen the training envelope.
-- **Narrow main-blow flow range.** Median lance flows across heats cluster between 4.6 and 5.1 m³/s [[WY: B 版 q2_mass_balance_consistency.csv 中十炉活跃期中位流量为四点一六至五点一八，其中第五炉因过滤断行跳变为四点一六、第二炉为五点一八，请核对 A/B 两版口径决定是否更新此区间]], so delay–flow identification rests on modest flow variations. Under Assumption 1, $T_{\mathrm{mix}}$ cannot be separated from $\Delta V_{\mathrm{pipe}}$ without deliberate flow steps.
+- **Limited sample of ten heats.** Heats 1 and 3 have the highest CO readings of the ten heats, so the zero-probe model extrapolates when either is held out, and coverage falls to 62%. Additional heats, particularly high-carbon blows, would widen the training envelope.
+- **Narrow main-blow flow range.** Median lance flows across heats cluster between 4.6 and 5.1 m³/s, so delay–flow identification rests on modest flow variations. Under Assumption 1, $T_{\mathrm{mix}}$ cannot be separated from $\Delta V_{\mathrm{pipe}}$ without deliberate flow steps.
 - **Undocumented gas units.** Assumption 4 relies on the carbon–oxygen balance rather than instrument manuals, leaving absolute flue-gas volume unverified until analyzer calibration records become available.
 
 ### 9.3 Further Discussion
@@ -488,7 +488,7 @@ We developed a delay-aware framework that fuses real-time flame spectra with del
 
 For Task 1, our Rank-Constrained Robust Low-Rank model decomposed each log spectrum into three physical components and sparse outliers. It detected injected spikes with an F1 score of 0.89, reconstructed held-out pixels within a 2.0% relative error and generated continuous spectral surfaces for all ten heats.
 
-For Task 2, the reconstructed process signals revealed four blowing stages with breakpoints at 23%, 43% and 90% of total oxygen. The Plug-Flow Delay model yielded $\tau(Q) = 5 + 127.1/Q$ s—dropping from 47.4 s at 3 m³/s to 30.4 s at 5 m³/s—and independent checks confirmed that delay decreases with flow.
+For Task 2, the reconstructed process signals revealed four blowing stages with breakpoints at 23%, 43% and 90% of total oxygen. The Plug-Flow Delay model yielded $\tau(Q) = 5 + 127.1/Q$ s, which drops from 47.4 s at 3 m³/s to 30.4 s at 5 m³/s, and independent checks confirmed that delay decreases with flow.
 
 For Task 3, the Dual-Modal Soft Sensor combined heat-level models through causal similarity weighting. Without probe readings, it predicted delay-aligned CO and CO₂ at mean R² of 0.873 and 0.658 across all ten heats; adding one probe reading every 120 s raised R² to 0.908 and 0.695. Flame spectra can thus replace most probe readings while delivering off-gas information roughly 30 s earlier.
 
