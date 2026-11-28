@@ -4,7 +4,7 @@
 > - 本文稿只写文字，不做 LaTeX/Word 排版。每处图表用方框标注：**图号、文件路径、建议宽度、图注**。标注“PLACEHOLDER”的图尚未绘制，排版时先放占位框。
 > - 所有数字取自冻结结果：A 版 `B_results/tables/`，B 版 `solution_v4_verified/solution_outputs/tables/`（提交 `416495a`），以及本轮补算的 `B_results/tables/q3_delay_misestimation_sensitivity.csv`。每节末尾的“数字出处”只供核对，不进入论文。
 > - 篇幅：摘要 466 词；正文（引言至结论）6,321 词，另有图注约 490 词与 9 张表；15 张图。按 APMCM 模板粗估 25–27 页，**有超出 25 页上限的风险**。排版时按顺序处理：① 正文用 11 pt（规范允许 11 或 12 pt）；② 仍超页则把 Table 2、Figure 3、Figure 8 移入附录（正文保留一句引用）；③ 再超则把 Table 9 压缩为 5 行。
-> - 参考文献只列已确认真实存在的经典文献；转炉火焰光谱与烟气分析的领域文献需要队员补充并核实后再加入。
+> - 参考文献共 13 篇，全部已逐条核实 DOI 与真实出版信息（含 10 篇经典方法文献与 3 篇转炉火焰光谱/烟气控制/工业软测量领域文献）。
 
 ---
 
@@ -38,9 +38,9 @@ Sensitivity analysis shows that a ±10% error in the duct volume shifts the zero
 
 ### 1.1 Background
 
-The basic oxygen converter turns hot metal into steel by blowing high-purity oxygen through a lance at supersonic speed. Silicon, manganese, phosphorus and carbon are oxidized in turn, and the carbon leaves the bath as CO and CO₂. Operators must time the end of the blow so that the carbon content and temperature of the steel reach their targets together. They therefore follow the progress of decarburization from two sources. A spectrometer at the converter mouth records the flame radiation every 0.5 s, and a Raman analyzer at the flue-gas bend records the CO and CO₂ contents at the same rate.
+The basic oxygen converter turns hot metal into steel by blowing high-purity oxygen through a lance at supersonic speed. Silicon, manganese, phosphorus and carbon are oxidized in turn, and the carbon leaves the bath as CO and CO₂. Operators must time the end of the blow so that the carbon content and temperature of the steel reach their targets together [11]. They therefore follow the progress of decarburization from two sources. A spectrometer at the converter mouth records the flame radiation every 0.5 s [12], and a Raman analyzer at the flue-gas bend records the CO and CO₂ contents at the same rate.
 
-The two sources see the same reactions at different times. The flame responds to the bath immediately, while the gas must travel through the hood and the duct before the analyzer can measure it. This transport delay limits endpoint control, because a decision based on the analyzer refers to a bath state that is already half a minute old. The sampling probe also wears quickly in the dusty, high-temperature duct, so frequent sampling is costly. A model that reads the off-gas state from the flame would provide the signal earlier and would allow the probe to work less often.
+The two sources see the same reactions at different times. The flame responds to the bath immediately, while the gas must travel through the hood and the duct before the analyzer can measure it. This transport delay limits endpoint control, because a decision based on the analyzer refers to a bath state that is already half a minute old [11, 13]. The sampling probe also wears quickly in the dusty, high-temperature duct, so frequent sampling is costly. A data-driven soft sensor that reads the off-gas state from the flame [12, 13] would provide the signal earlier and would allow the probe to work less often.
 
 > **[Figure 1 — PLACEHOLDER]** 自绘示意图：转炉、氧枪、炉口光谱仪（标注 real-time）、烟罩与烟道、弯头处拉曼分析仪（标注 delayed），烟道中画出气团输运箭头，标出 $\Delta V_{\mathrm{pipe}}$。宽度 0.7。
 > Caption: **Dual-modal measurement at the converter.** The spectrometer observes the flame in real time; the analyzer observes the same reactions after the gas has crossed the duct volume $\Delta V_{\mathrm{pipe}}$.
@@ -516,7 +516,11 @@ For Task 3, the Dual-Modal Soft Sensor combined heat-level models through causal
 
 [10] Levenspiel, O. (1999). *Chemical Reaction Engineering* (3rd ed.). Wiley.
 
-（待补：转炉炉口火焰光谱与终点控制、转炉烟气分析时延方面的 2–3 篇领域文献，需逐条核实后加入。）
+[11] Wang, Z., Liu, Q., Liu, H., & Wei, S. (2020). A review of end-point carbon prediction for BOF steelmaking process. *High Temperature Materials and Processes*, 39(1), 653–662.
+
+[12] Zhao, B., Zhao, J., Wu, W., Zhang, F., & Yao, T. (2023). Research on prediction model of converter temperature and carbon content based on spectral feature extraction. *Scientific Reports*, 13(1), Article 14409.
+
+[13] Kadlec, P., Gabrys, B., & Strandt, S. (2009). Data-driven soft sensors in the process industry. *Computers & Chemical Engineering*, 33(4), 795–814.
 
 ---
 
