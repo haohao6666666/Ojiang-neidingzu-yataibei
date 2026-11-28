@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parent
 BOOK = "B题论文文稿.md"
 A = "B_results/figures"
 FIGURES = {
-    1: ("fig01_dual_modal_schematic", 0.75),
+    1: ("fig01_dual_modal_schematic", 1.0),
     2: ("fig02_framework", 1.0),
     3: ("fig03_preprocessing_workflow", 1.0),
     4: ("fig04_o2_counter_beat", 1.0),

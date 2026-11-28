@@ -42,8 +42,8 @@ The basic oxygen converter turns hot metal into steel by blowing high-purity oxy
 
 The two sources see the same reactions at different times. The flame responds to the bath immediately, while the gas must travel through the hood and the duct before the analyzer can measure it. This transport delay limits endpoint control, because a decision based on the analyzer refers to a bath state that is already half a minute old. The sampling probe also wears quickly in the dusty, high-temperature duct, so frequent sampling is costly. A data-driven soft sensor that reads the off-gas state from the flame [12, 13] would provide the signal earlier and would allow the probe to work less often.
 
-> **[Figure 1]** `paper_figures/out/fig01_dual_modal_schematic.pdf`，宽度 0.75。（AI 生成的无字底图 + 代码叠加英文标签；底图在 `paper_figures/base/`）
-> Caption: Dual-modal sensing layout of the basic oxygen converter.
+> **[Figure 1]** `paper_figures/out/fig01_dual_modal_schematic.pdf`，宽度 1.0。（(a) Wikimedia Commons 实景照片，CC0；(b) AI 生成的无字底图 + 代码叠加英文标签；底图在 `paper_figures/base/`）
+> Caption: Dual-modal sensing at the basic oxygen converter. (a) A converter shop during hot-metal charging (photo: DDEKK, Wikimedia Commons, CC0). (b) The flame is observed in real time, whereas the off-gas reaches the analyzer only after crossing the duct volume $\Delta V_{\mathrm{pipe}}$.
 
 ### 1.2 Restatement of the Problem
 
