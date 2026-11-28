@@ -42,7 +42,7 @@ The basic oxygen converter turns hot metal into steel by blowing high-purity oxy
 
 The two sources see the same reactions at different times. The flame responds to the bath immediately, while the gas must travel through the hood and the duct before the analyzer can measure it. This transport delay limits endpoint control, because a decision based on the analyzer refers to a bath state that is already half a minute old. The sampling probe also wears quickly in the dusty, high-temperature duct, so frequent sampling is costly. A data-driven soft sensor that reads the off-gas state from the flame [12, 13] would provide the signal earlier and would allow the probe to work less often.
 
-> **[Figure 1 — PLACEHOLDER]** 自绘示意图：转炉、氧枪、炉口光谱仪（标注 real-time）、烟罩与烟道、弯头处拉曼分析仪（标注 delayed），烟道中画出气团输运箭头，标出 $\Delta V_{\mathrm{pipe}}$。宽度 0.7。
+> **[Figure 1]** `paper_figures/out/fig01_dual_modal_schematic.pdf`，宽度 0.7。（已按欧拉奖风格重画，图注修改建议见 `paper_figures/README.md`）
 > Caption: **Dual-modal measurement at the converter.** The spectrometer observes the flame in real time; the analyzer observes the same reactions after the gas has crossed the duct volume $\Delta V_{\mathrm{pipe}}$.
 
 ### 1.2 Restatement of the Problem
@@ -58,7 +58,7 @@ The problem provides the full-process flame spectra (2,047 wavelengths, 0.5-s st
 
 Figure 2 outlines our workflow. We first diagnose the data and resolve four inconsistencies that would otherwise distort every downstream step. Section 4 then introduces an arrival-time map linking each real-time flame observation to the delayed gas reading it generates. The three tasks proceed as an integrated pipeline. First, Task 1 builds a low-rank model of the flame spectra to remove outliers and supply cleaned spectral representations. Second, Task 2 reconstructs the process curves, partitions each blow into chemical stages and quantifies how transport delay varies with lance flow. Finally, Task 3 feeds a spectral basis built on the low-rank structure of Task 1 and the delay map from Task 2 into a causal real-time predictor. It combines the heat-level models and updates predictions whenever a probe reading arrives.
 
-> **[Figure 2 — PLACEHOLDER]** 全宽框架图（三条色带：Data & Diagnosis → Models → Validation & Output）。Data：four data issues；Task 1 RLR → continuous spectral surface；Task 2 signal reconstruction → four stages → PFD delay $\tau(Q)$；Task 3 causal features → DSS → Smith correction → conformal interval；Validation：injection test, hold-out, LOHO, sensitivity。用箭头表示 Task 1 的光谱基和 Task 2 的时延都输入 Task 3。宽度 1.0。
+> **[Figure 2]** `paper_figures/out/fig02_framework.pdf`，宽度 1.0。（已按欧拉奖风格重画，图注修改建议见 `paper_figures/README.md`）
 > Caption: **Framework of our work.** The low-rank spectral structure of Task 1 and the delay model of Task 2 feed the soft sensor of Task 3.
 
 ---
@@ -105,7 +105,7 @@ Figure 2 outlines our workflow. We first diagnose the data and resolve four inco
 
 Each attachment contains about 1,400 spectra of 2,047 wavelengths and the corresponding oxygen and gas records. Every model in this paper depends on the time axis, the lance flow and the meaning of the gas readings, so we examine these three items before modelling. Figure 3 shows the workflow, and Table 2 summarizes the ten heats after preprocessing.
 
-> **[Figure 3 — PLACEHOLDER]** 预处理流程图：Raw attachments → (1) corrected Attachment 1 → (2) time step of Heat 5 → (3) unified wavelength grid → (4) oxygen counter de-beating → (5) carbon–oxygen balance → clean dataset。宽度 0.9。
+> **[Figure 3]** `paper_figures/out/fig03_preprocessing_workflow.pdf`，宽度 1.0。（已按欧拉奖风格重画，图注修改建议见 `paper_figures/README.md`）
 > Caption: **Data preprocessing workflow.** Four checks fix the time axis, the lance flow and the meaning of the gas readings.
 
 > **Table 2. Overview of the ten heats after preprocessing**
@@ -137,7 +137,7 @@ The cumulative oxygen does not grow smoothly. Its counter advances in steps of a
 
 We first apply isotonic regression to keep $V(t)$ non-decreasing. We then estimate $Q(t)$ as the slope of a linear regression over a sliding window. A window of 24 s spans about two beat periods, so the skipped and doubled steps cancel within it. Figure 4b compares three window lengths in the main blow of Heat 3. The 5-s slope still oscillates between 4 and 6 m³/s, and the 12-s slope keeps a visible ripple. With the 24-s window, the residual standard deviation of the flow falls from 0.27 to 0.16 m³/s in Heat 3, and it falls by 24–40% in the other heats. A longer window removes more ripple but also blurs real changes of the lance flow, so 24 s is the shortest window that covers two full beats.
 
-> **[Figure 4]** `B_results/figures/fig_q2_o2_beat_artifact.pdf`，宽度 1.0。
+> **[Figure 4]** `paper_figures/out/fig04_o2_counter_beat.pdf`，宽度 1.0。（已按欧拉奖风格重画，图注修改建议见 `paper_figures/README.md`）
 > Caption: **Beat artifact of the oxygen counter (Heat 3).** (a) Counter increments in a 60-s window of the main blow: single steps of 4.72 m³ and double steps about every 11.5 s. (b) Lance flow estimated by regression slopes over 5-s, 12-s and 24-s windows; SD denotes the residual standard deviation after detrending.
 
 ### 3.4 Carbon–Oxygen Balance Check
@@ -146,7 +146,7 @@ The problem describes the CO and CO₂ values as volume flow rates in m³/s. We 
 
 The ratio cannot exceed one if the values are flow rates. During the main blow, however, $y_{\mathrm{CO}} + y_{\mathrm{CO_2}}$ stays between 49 and 61 and remains at or below 72, which matches typical converter off-gas composition in percent by volume. We therefore interpret the readings as volume fractions. The cumulative emissions required by Task 2 are still computed as time integrals of the readings, and our later conclusions rely on relative changes rather than on absolute gas volumes. If all blown oxygen leaves the bath as CO and CO₂, the stable ratio across heats implies an effective diluted flue-gas flow of about 16.9 m³/s. Its narrow spread also indicates that the measurement chain behaves consistently across heats, supporting a common delay model.
 
-> **[Figure 5]** `B_results/figures/q2_mass_balance.pdf`，宽度 0.7。
+> **[Figure 5]** `paper_figures/out/fig05_carbon_oxygen_balance.pdf`，宽度 0.7。（已按欧拉奖风格重画，图注修改建议见 `paper_figures/README.md`）
 > Caption: **Carbon–oxygen balance under the flow-rate reading.** The oxygen required by the measured CO and CO₂ exceeds the supplied oxygen by a factor of 5.5–6.5 in every heat, so the readings are volume fractions.
 
 ---
@@ -167,7 +167,7 @@ $$
 
 Equation (2) casts the delay–flow relation of Task 2 in a directly testable form: total delay decreases as flow rises, and its excess over $T_{\mathrm{mix}}$ scales inversely with $Q$. This transport map also anchors the other two tasks. It defines the real-time prediction target as $y\bigl(t_{\mathrm{arr}}(t)\bigr)$ and tells the online corrector which past prediction a new probe reading verifies. Finally, it establishes cumulative oxygen as a natural coordinate for cross-heat comparison: two heats with equal oxygen consumption have reached the same blowing stage even when their flow profiles differ (Figure 6).
 
-> **[Figure 6 — PLACEHOLDER]** 时间映射示意图：上方时间轴标出 bath event at $t$（火焰立即响应）与 analyzer reading at $t_{\mathrm{arr}}$；下方为累积耗氧坐标，标出 $V(t)$ 与 $V(t)+\Delta V_{\mathrm{pipe}}$；用两种流量（低/高）展示同一 $\Delta V_{\mathrm{pipe}}$ 对应不同时延。宽度 0.8。
+> **[Figure 6]** `paper_figures/out/fig06_arrival_time_map.pdf`，宽度 0.8。（已按欧拉奖风格重画，图注修改建议见 `paper_figures/README.md`）
 > Caption: **Arrival-time map.** The duct must be refilled by $\Delta V_{\mathrm{pipe}}$ before the gas generated at $t$ reaches the analyzer, so a larger lance flow gives a shorter delay.
 
 ---
@@ -210,7 +210,7 @@ The components have a clear physical meaning. In every heat, the score of the fi
 
 Figure 7 shows the decomposition for Heat 3. The low-rank part keeps the rise of the flame during ignition, the plateau of the main blow and the decay near the end. The sparse part concentrates on two narrow bands at 767 nm and 589 nm, the two strongest emission peaks of the mean spectrum. These lines fluctuate independently of the continuum and may correspond to the potassium doublet (766.5/769.9 nm) and the sodium D lines.
 
-> **[Figure 7]** `B_results/figures/q1_rpca_decomposition.pdf`，宽度 1.0。
+> **[Figure 7]** `paper_figures/out/fig07_rlr_decomposition.pdf`，宽度 1.0。（已按欧拉奖风格重画，图注修改建议见 `paper_figures/README.md`）
 > Caption: **Low-rank plus sparse decomposition of Heat 3.** The low-rank part carries the evolution of the blow; the sparse part concentrates on the emission lines near 767 nm and 589 nm.
 
 We test the detector by injecting known outliers into clean spectra of Heats 3 and 8. Spikes of 5–10 robust standard deviations hit 1% of the pixels, and Gaussian bumps of 0.2–0.5 in log intensity distort 1% of the frames. Table 3 compares RLR with a one-dimensional Hampel filter [3]; higher F1 and lower error are better. RLR finds 93% of the spikes with a precision of 87%, while the Hampel filter mistakes flicker for spikes and misses most of them. The Hampel filter also cannot recognize distorted frames, because it judges each frame by its total intensity. Removing the detected outliers lowers the reconstruction error on the corrupted pixels from 0.068 to 0.041.
@@ -239,14 +239,14 @@ We evaluate reconstruction by hiding 10% of the valid pixels and predicting them
 
 When whole frames are hidden, every method reaches an error of about 0.36 (RLR: 0.362; linear interpolation: 0.364). This floor reflects the frame-to-frame flicker of the flame, whose standard deviation around the trend surface is 0.30–0.71 in log intensity. The flicker comes from turbulent combustion at the mouth and cannot be inferred from neighbouring frames, so Equation (4) represents it as the residual around a continuous trend. Figure 8 shows a detected anomalous frame and the reconstruction at 600 nm.
 
-> **[Figure 8]** `B_results/figures/q1_outlier_example.pdf`，宽度 1.0。
+> **[Figure 8]** `paper_figures/out/fig08_outlier_reconstruction.pdf`，宽度 1.0。（已按欧拉奖风格重画，图注修改建议见 `paper_figures/README.md`）
 > Caption: **Outlier detection and reconstruction.** Left: intensity at 600 nm with detected outliers and the continuous reconstruction. Right: an anomalous frame, rebuilt from its retained pixels.
 
 #### 5.2.3 Continuous 3D Spectral Surfaces
 
 Figure 9 presents the continuous spectral surfaces of the ten heats. All heats share the same pattern. A dark ignition stage of 1–2 min ends with a sharp rise as the main blow starts. A broad plateau with its maximum between 750 and 900 nm follows, and the intensity declines at the end of the blow. The 6C heats reach higher intensities than the 6B heats and show more saturation, which agrees with the different instrument settings identified in Section 3.1. The timing of the rise and the decline matches the stage breakpoints found from the gas data in Section 6.2, which shows that the flame and the gas describe the same process.
 
-> **[Figure 9]** `B_results/figures/q1_surface_grid.pdf`，宽度 1.0，占半页以上。单炉大图 `q1_surface_heat01–10.pdf` 放附录。
+> **[Figure 9]** `paper_figures/out/fig09_spectral_surfaces.pdf`，宽度 1.0。（已按欧拉奖风格重画，图注修改建议见 `paper_figures/README.md`）
 > Caption: **Continuous spectral surfaces of the ten heats (trend surfaces, log₁₀ intensity).** Every heat shows ignition, a main-blow plateau and an end-of-blow decline; the 6C heats are brighter.
 
 > 数字出处（不进论文）：A 版 `q1_outlier_summary.csv`、`q1_rank_selection.csv`、`q1_injection_test.csv`、`q1_reconstruction_error_summary.csv`、`q1_frame_holdout_summary.csv`、`q1_emission_peaks.csv`；成分物理含义为本轮由 `data_clean/heat*_spec.npz` 计算（第 1 成分得分与 log 总光强 |r| = 1.00；第 2 成分与亮度 |r| = 0.03、与 800/500 nm 比 0.52、与钾线对比度 0.48，均为十炉平均）。
@@ -263,7 +263,7 @@ The lance flow $Q(t)$ comes from the 24-s regression slope of Section 3.3, and $
 
 Figure 10 shows the six curves of Heat 3. The flow holds at about 2.4 m³/s during ignition, steps up to about 4.8 m³/s in the main blow and rises again near the end. CO₂ peaks within the first three minutes, whereas CO rises later and stays high until the end of the blow. The cumulative emissions therefore grow in opposite orders: the CO₂ curve rises early and flattens, and the CO curve starts slowly and steepens.
 
-> **[Figure 10]** `B_results/figures/q2_curves_heat03.pdf`，宽度 1.0。其余九炉 `q2_curves_heat*.pdf` 放附录。
+> **[Figure 10]** `paper_figures/out/fig10_process_curves_heat03.pdf`，宽度 1.0。（已按欧拉奖风格重画，图注修改建议见 `paper_figures/README.md`）
 > Caption: **Continuous process curves of Heat 3:** lance flow, cumulative oxygen, CO, CO₂ and their cumulative emissions. CO₂ peaks early and CO late; dotted lines mark the stage breakpoints.
 
 ### 6.2 Four-Stage Relationship between Oxygen and Off-Gas
@@ -283,7 +283,7 @@ For each heat, we therefore fit $y_{\mathrm{CO}}(V)$ with a continuous piecewise
 
 The four stages follow converter bath chemistry. During Stage I, silicon and manganese consume much of the blown oxygen, and carbon oxidized at low bath temperature leaves primarily as CO₂. As the bath heats up in Stage II, decarburization accelerates and CO rises by 0.055 percentage points per cubic metre of oxygen. Stage III forms a steady plateau where CO remains nearly flat and accounts for roughly three quarters of the carbon-bearing off-gas. Finally, carbon depletion in Stage IV causes CO to decline sharply. The cumulative emissions follow the same breakpoints: a piecewise-linear fit of $E_{\mathrm{CO}}(V)$ and $E_{\mathrm{CO_2}}(V)$ reaches $R^2 = 0.998$ with a lower AIC than logistic or quadratic fits. Between the two converter groups, only the Stage III slope differs significantly (Mann–Whitney test, $p = 0.02$).
 
-> **[Figure 11]** `B_results/figures/q2_relation_instant.pdf`，宽度 1.0。
+> **[Figure 11]** `paper_figures/out/fig11_four_stage_relation.pdf`，宽度 1.0。（已按欧拉奖风格重画，图注修改建议见 `paper_figures/README.md`）
 > Caption: **CO and CO₂ versus cumulative oxygen for the ten heats.** Three breakpoints divide every blow into the same four stages; dashed lines are the piecewise-linear fits.
 
 ### 6.3 Plug-Flow Delay Model (PFD)
@@ -321,7 +321,7 @@ Table 6 evaluates Equation (6) at typical flows. At the ignition flow of 2.35 m�
 | $\tau$ (s) | 59.1 | 47.4 | 36.8 | 31.8 | 30.4 | 28.1 | 26.2 | 23.2 |
 | 95% interval (s) | 57.5–61.4 | 46.1–49.2 | 35.8–38.2 | 31.0–32.9 | 29.7–31.5 | 27.4–29.1 | 25.6–27.1 | 22.6–23.9 |
 
-> **[Figure 12]** `solution_v4_verified/solution_outputs/figures/q2_variable_delay_and_diagnostics.pdf`，宽度 1.0。
+> **[Figure 12]** `paper_figures/out/fig12_plug_flow_delay.pdf`，宽度 1.0。（已按欧拉奖风格重画，图注修改建议见 `paper_figures/README.md`）
 > Caption: **Plug-flow delay model.** Left: $\tau(Q)$ with the 95% bootstrap band and the ignition and main-blow onset events. Middle: oxygen-equivalent readings of the ten heats collapse onto one trajectory in the oxygen coordinate. Right: apparent scale factor of each heat.
 
 #### 6.4.2 Validation against Main-Blow Onset Events
@@ -342,7 +342,7 @@ This check requires no transport model. A cross-correlation between the first sp
 | Constant delay maximizing spectral predictability | full blow | 31 |
 | First gas after ignition (upper bound) | 2.35 | median 49.8 |
 
-> **[Figure 13 — 需修改后使用]** `B_results/figures/q2_delay_vs_flow.pdf`，宽度 0.7。**排版前须重画**：去掉图中 A 版的 170/Q 曲线与其置信带，改画 PFD 曲线 $\tau = 5 + 127.1/Q$，保留窗口散点与分档中位数，避免与正文的时延模型矛盾。
+> **[Figure 13]** `paper_figures/out/fig13_windowed_delay_vs_flow.pdf`，宽度 0.7。（已按欧拉奖风格重画，图注修改建议见 `paper_figures/README.md`）
 > Caption: **Windowed delay estimates versus lance flow.** Dots are 44 window estimates and squares are the medians of four flow bins with interquartile ranges; the curve is the PFD model of Equation (6).
 
 The windowed estimates fall faster with the flow than $1/Q$ does. This suggests that the duct volume is not the only factor; a higher flow may also enhance mixing and post-combustion in the hood. In the main-blow flow range of 4.4–6.6 m³/s, Equation (6) gives 24–34 s. These values stay below the two event-based upper bounds and agree with the constant delay of 31 s that maximizes spectral predictability. We therefore adopt Equation (6) as the delay model for Task 3 and test the consequence of a ±10% error in $\Delta V_{\mathrm{pipe}}$ in Section 8.
@@ -415,7 +415,7 @@ Figure 14 presents the LOHO predictions across all ten heats. The zero-probe DSS
 
 The conformal intervals perform as designed. Without probe readings, the 90% intervals average a half-width of 10.1 for CO and cover 87.0% of readings. Coverage drops to 62% in the two heats with the highest CO readings (Heats 1 and 3) and reaches 76–100% in the remaining heats. Under continuous correction, the half-width narrows to 5.7, and coverage reaches 89.8% for CO and 89.75% for CO₂, close to the nominal target level.
 
-> **[Figure 14]** `solution_v4_verified/solution_outputs/figures/q3_all10_loho_predictions.pdf`，宽度 1.0，占大半页。
+> **[Figure 14]** `paper_figures/out/fig14_loho_predictions.pdf`，宽度 1.0。（已按欧拉奖风格重画，图注修改建议见 `paper_figures/README.md`）
 > Caption: **Leave-one-heat-out predictions of CO and CO₂ for the ten heats** with 90% conformal intervals. The model tracks every blowing stage; Heat 1, whose CO in the first half of the main blow exceeds that of all other heats, is the hardest extrapolation case.
 
 #### 7.3.3 Reducing Probe Usage
@@ -424,7 +424,7 @@ The DSS shifts the probe from a continuous sensor to an occasional calibrator. F
 
 This trade-off yields clear operating points. Sampling every 60 s saves 99.2% of probe readings while maintaining CO R² at 0.920; sampling every 30 s saves 98.3% and reaches 0.934. In a partial least squares analysis, the highest-importance wavelengths lie at 765–770 nm and 590 nm, the potassium and sodium lines isolated in Task 1, followed by the 730–825 nm continuum. The same atomic emission lines thus separate sparse outliers in Task 1 and carry off-gas information in Task 3.
 
-> **[Figure 15]** `solution_v4_verified/solution_outputs/figures/q3_transfer_pareto_and_vip.pdf`，宽度 1.0。
+> **[Figure 15]** `paper_figures/out/fig15_transfer_probe_vip.pdf`，宽度 1.0。（已按欧拉奖风格重画，图注修改建议见 `paper_figures/README.md`）
 > Caption: **Cross-heat transfer, probe-saving trade-off and wavelength importance.** Left: single-heat transfer matrix showing poor one-to-one generalization. Middle: with one reading every 120 s, Smith correction keeps CO R² above 0.9, whereas the lagged reading falls to 0.59. Right: potassium and sodium lines carry the highest PLS VIP scores.
 
 > 数字出处（不进论文）：B 版 `q3_loho_ablation_summary.csv`、`q3_loho_per_heat_metrics.csv`（Combined_SoftGated_Hybrid 逐炉 CO：0.673/0.775/0.806/0.939/0.897/0.959/0.856/0.962/0.970/0.891；CO₂ 最弱为 H05 0.333、H01 0.386、H09 0.495）、`q3_single_heat_transfer_matrix.csv`、`q3_conformal_90pct_coverage.csv`（零探头 CO 逐炉 0.62–1.00、均值 0.870、半宽 10.14；连续校正半宽 5.65）、`q3_transition_regime_rmse.csv`、`q3_pls_vip_wavelength.csv`、`verification_audit_report.csv`（第 5、6 项泄漏检验）；颜色温度与指纹定义见 `q3_fusion_predict.py`；Heat 1/Heat 3 的 CO 比较（30%–65% 耗氧区间 Heat 1 最高，70% 之后 Heat 3 最高，峰值 63.8）见 `B_results/tables/q3_co_by_oxygen_fraction.csv`（由原始数据按耗氧分数分箱取中位数）。
