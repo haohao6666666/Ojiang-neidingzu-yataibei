@@ -16,3 +16,10 @@
 报名号尚未提供。使用正式队号替换 `team-number.tex` 中的占位文本。
 
 打开 [PDF 校样](APMCM-B-preview.pdf) 查看最新版。校样共25页，图15在PDF第22页，三个子图自上而下排列，分别附有图内说明。
+
+## 2026-11-28 更新：图1、图2
+
+- `figures/fig01_dual_modal_schematic.pdf` 和 `figures/fig02_framework.pdf` 已换成新版：AI 生成无字底图，再用代码叠加英文。源文件和底图在仓库的 `paper_figures/`（`fig01_dual_modal_schematic.py`、`fig02_framework.py`、`base/`）。
+- 图1宽度改为 0.75（`sections/body.tex` 与 `prepare_paper.py` 已同步）。旧的手绘脚本改名为 `figure-source/draft_fig01_schematic.py`，避免运行后覆盖新图。
+- 重新编译后正文仍为 23 页（Page x of 23），没有因为新图增加页数。
+- **待处理**：当前 `sections/summary.tex` 编译后摘要页溢出约两行，关键词落到了第 2 页，导致总页数变成 26。仓库里的 `APMCM-B-preview.pdf` 是摘要润色之前编译的，所以没有显示这个问题。需要把摘要删短约两行。
